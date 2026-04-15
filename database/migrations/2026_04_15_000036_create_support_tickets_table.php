@@ -8,17 +8,13 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('support_tickets', function (Blueprint $table) {
-            $table->string('id')->primary();
-            $table->string('client_id');
-            $table->foreign('client_id')->references('id')->on('clients')->cascadeOnDelete();
-
+            $table->id();
+            $table->foreignId('client_id')->constrained('clients')->cascadeOnDelete();
             $table->foreignId('support_category_id')->constrained('support_categories');
-
             $table->string('sujet');
             $table->text('description')->nullable();
             $table->string('statut')->default('ouvert');
-            $table->string('traite_par')->nullable();
-            $table->foreign('traite_par')->references('id')->on('users')->nullOnDelete();
+            $table->foreignId('traite_par')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamp('resolved_at')->nullable();
             $table->timestamps();
         });

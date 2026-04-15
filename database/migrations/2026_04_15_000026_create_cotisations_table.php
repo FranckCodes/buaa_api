@@ -9,9 +9,7 @@ return new class extends Migration {
     {
         Schema::create('cotisations', function (Blueprint $table) {
             $table->id();
-            $table->string('adhesion_id');
-            $table->foreign('adhesion_id')->references('id')->on('adhesions')->cascadeOnDelete();
-
+            $table->foreignId('adhesion_id')->constrained('adhesions')->cascadeOnDelete();
             $table->integer('annee');
             $table->decimal('montant', 12, 2);
             $table->string('statut')->default('en_attente');

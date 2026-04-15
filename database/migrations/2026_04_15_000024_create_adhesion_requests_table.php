@@ -8,7 +8,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('adhesion_requests', function (Blueprint $table) {
-            $table->string('id')->primary();
+            $table->id();
             $table->string('nom');
             $table->string('demandeur_type');
             $table->foreignId('client_activity_type_id')->nullable()->constrained('client_activity_types')->nullOnDelete();
@@ -27,8 +27,7 @@ return new class extends Migration {
             $table->integer('experience_annees')->nullable();
             $table->integer('nombre_animaux')->nullable();
             $table->string('type_elevage')->nullable();
-            $table->string('traite_par')->nullable();
-            $table->foreign('traite_par')->references('id')->on('users')->nullOnDelete();
+            $table->foreignId('traite_par')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

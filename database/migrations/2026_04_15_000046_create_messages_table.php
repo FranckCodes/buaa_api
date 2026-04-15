@@ -10,17 +10,12 @@ return new class extends Migration {
         Schema::create('messages', function (Blueprint $table) {
             $table->id();
             $table->foreignId('conversation_id')->constrained('conversations')->cascadeOnDelete();
-
-            $table->string('sender_id');
-            $table->foreign('sender_id')->references('id')->on('users')->cascadeOnDelete();
-
+            $table->foreignId('sender_id')->constrained('users')->cascadeOnDelete();
             $table->text('text')->nullable();
             $table->string('type')->default('text');
             $table->string('image_url')->nullable();
             $table->string('file_url')->nullable();
-
             $table->foreignId('reply_to_message_id')->nullable()->constrained('messages')->nullOnDelete();
-
             $table->string('status')->default('sent');
             $table->timestamp('deleted_at')->nullable();
             $table->timestamps();

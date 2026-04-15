@@ -8,14 +8,9 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('insurance_claims', function (Blueprint $table) {
-            $table->string('id')->primary();
-
-            $table->string('insurance_id');
-            $table->foreign('insurance_id')->references('id')->on('insurances')->cascadeOnDelete();
-
-            $table->string('client_id');
-            $table->foreign('client_id')->references('id')->on('clients')->cascadeOnDelete();
-
+            $table->id();
+            $table->foreignId('insurance_id')->constrained('insurances')->cascadeOnDelete();
+            $table->foreignId('client_id')->constrained('clients')->cascadeOnDelete();
             $table->string('type_sinistre');
             $table->decimal('montant_reclame', 12, 2);
             $table->decimal('montant_approuve', 12, 2)->nullable();
@@ -23,8 +18,7 @@ return new class extends Migration {
             $table->text('description')->nullable();
             $table->date('date_sinistre')->nullable();
             $table->date('date_soumission');
-            $table->string('traite_par')->nullable();
-            $table->foreign('traite_par')->references('id')->on('users')->nullOnDelete();
+            $table->foreignId('traite_par')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

@@ -9,9 +9,7 @@ return new class extends Migration {
     {
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
-            $table->string('user_id');
-            $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
-
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->string('category');
             $table->string('type');
             $table->string('title');
@@ -19,10 +17,7 @@ return new class extends Migration {
             $table->boolean('is_read')->default(false);
             $table->string('action_label')->nullable();
             $table->string('action_url')->nullable();
-
-            $table->string('from_user_id')->nullable();
-            $table->foreign('from_user_id')->references('id')->on('users')->nullOnDelete();
-
+            $table->foreignId('from_user_id')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

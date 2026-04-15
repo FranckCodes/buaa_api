@@ -9,9 +9,7 @@ return new class extends Migration {
     {
         Schema::create('credit_payments', function (Blueprint $table) {
             $table->id();
-            $table->string('credit_id');
-            $table->foreign('credit_id')->references('id')->on('credits')->cascadeOnDelete();
-
+            $table->foreignId('credit_id')->constrained('credits')->cascadeOnDelete();
             $table->integer('periode_annee');
             $table->integer('periode_mois');
             $table->decimal('montant', 12, 2);

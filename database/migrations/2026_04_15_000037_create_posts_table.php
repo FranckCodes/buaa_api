@@ -9,13 +9,11 @@ return new class extends Migration {
     {
         Schema::create('posts', function (Blueprint $table) {
             $table->id();
-            $table->string('author_id');
-            $table->foreign('author_id')->references('id')->on('users')->cascadeOnDelete();
+            $table->foreignId('author_id')->constrained('users')->cascadeOnDelete();
             $table->longText('content');
             $table->foreignId('post_tag_id')->constrained('post_tags');
             $table->foreignId('post_status_id')->constrained('post_statuses');
-            $table->string('valide_par')->nullable();
-            $table->foreign('valide_par')->references('id')->on('users')->nullOnDelete();
+            $table->foreignId('valide_par')->nullable()->constrained('users')->nullOnDelete();
             $table->text('motif_rejet')->nullable();
             $table->unsignedInteger('likes_count')->default(0);
             $table->timestamps();

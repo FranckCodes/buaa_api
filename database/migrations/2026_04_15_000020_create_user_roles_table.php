@@ -9,8 +9,7 @@ return new class extends Migration {
     {
         Schema::create('user_roles', function (Blueprint $table) {
             $table->id();
-            $table->string('user_id');
-            $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->foreignId('role_id')->constrained('roles')->cascadeOnDelete();
             $table->timestamp('assigned_at')->nullable();
             $table->timestamps();

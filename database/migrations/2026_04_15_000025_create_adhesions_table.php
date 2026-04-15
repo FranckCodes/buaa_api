@@ -8,16 +8,11 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('adhesions', function (Blueprint $table) {
-            $table->string('id')->primary();
-            $table->string('client_id');
-            $table->foreign('client_id')->references('id')->on('clients')->cascadeOnDelete();
-
-            $table->string('union_id');
-            $table->foreign('union_id')->references('id')->on('unions')->cascadeOnDelete();
-
+            $table->id();
+            $table->foreignId('client_id')->constrained('clients')->cascadeOnDelete();
+            $table->foreignId('union_id')->constrained('unions')->cascadeOnDelete();
             $table->foreignId('adhesion_type_id')->constrained('adhesion_types');
             $table->foreignId('adhesion_status_id')->constrained('adhesion_statuses');
-
             $table->string('numero_membre')->nullable()->unique();
             $table->date('date_adhesion');
             $table->date('prochaine_echeance')->nullable();
