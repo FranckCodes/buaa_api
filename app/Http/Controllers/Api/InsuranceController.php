@@ -7,6 +7,8 @@ use App\Http\Requests\Insurance\ActivateInsuranceRequest;
 use App\Http\Requests\Insurance\ApproveInsuranceClaimRequest;
 use App\Http\Requests\Insurance\StoreInsuranceClaimRequest;
 use App\Http\Requests\Insurance\StoreInsuranceRequest;
+use App\Http\Resources\InsuranceClaimResource;
+use App\Http\Resources\InsuranceResource;
 use App\Models\Insurance;
 use App\Models\InsuranceClaim;
 use App\Services\InsuranceService;
@@ -17,10 +19,11 @@ class InsuranceController extends Controller
 {
     public function index(): JsonResponse
     {
-        $items = Insurance::with(['client.user', 'type', 'status', 'treatedBy'])
-            ->latest()->paginate(15);
+        $this->authorize('viewAny', Insurance::class);
 
-        return response()->json(['message' => 'Liste des assurances.', 'data' => $items]);
+        return InsuranceResource::collection(
+            Insurance::with(['client.user', 'type', 'status'])->latest()->paginate(15)
+        )->additional(['message' => 'Liste des assurances.'])->response();
     }
 
     public function store(StoreInsuranceRequest $request, InsuranceService $insuranceService): JsonResponse
@@ -29,52 +32,54 @@ class InsuranceController extends Controller
 
         return response()->json([
             'message' => 'Souscription enregistrée avec succès.',
-            'data'    => $insurance->load(['client.user', 'type', 'status']),
+            'data'    => new InsuranceResource($insurance->load(['client.user', 'type', 'status'])),
         ], 201);
     }
 
     public function show(Insurance $insurance): JsonResponse
     {
-        $insurance->load(['client.user', 'type', 'status', 'treatedBy', 'beneficiaries', 'claims', 'documents']);
+        $this->authorize('view', $insurance);
 
-        return response()->json(["message" => "Détail de l'assurance.", 'data' => $insurance]);
+        return response()->json([
+            "message" => "Détail de l'assurance.",
+            'data'    => new InsuranceResource($insurance->load(['client.user', 'type', 'status', 'treatedBy', 'beneficiaries', 'claims', 'documents'])),
+        ]);
     }
 
     public function activate(ActivateInsuranceRequest $request, Insurance $insurance, InsuranceService $insuranceService): JsonResponse
     {
+        $this->authorize('activate', $insurance);
         $result = $insuranceService->activateInsurance($insurance, $request->integer('processed_by'));
 
-        return response()->json(['message' => 'Assurance activée avec succès.', 'data' => $result]);
+        return response()->json(['message' => 'Assurance activée avec succès.', 'data' => new InsuranceResource($result)]);
     }
 
     public function claimsIndex(): JsonResponse
     {
-        $items = InsuranceClaim::with(['insurance', 'client.user', 'treatedBy'])
-            ->latest()->paginate(15);
-
-        return response()->json(['message' => 'Liste des réclamations.', 'data' => $items]);
+        return InsuranceClaimResource::collection(
+            InsuranceClaim::with(['insurance', 'client.user', 'treatedBy'])->latest()->paginate(15)
+        )->additional(['message' => 'Liste des réclamations.'])->response();
     }
 
     public function storeClaim(StoreInsuranceClaimRequest $request, InsuranceService $insuranceService): JsonResponse
     {
         $claim = $insuranceService->createClaim($request->validated());
 
-        return response()->json(['message' => 'Réclamation créée avec succès.', 'data' => $claim], 201);
+        return response()->json(['message' => 'Réclamation créée avec succès.', 'data' => new InsuranceClaimResource($claim)], 201);
     }
 
     public function approveClaim(ApproveInsuranceClaimRequest $request, InsuranceClaim $claim, InsuranceService $insuranceService): JsonResponse
     {
         $result = $insuranceService->approveClaim($claim, (float) $request->input('amount'), $request->integer('processed_by'));
 
-        return response()->json(['message' => 'Réclamation approuvée avec succès.', 'data' => $result]);
+        return response()->json(['message' => 'Réclamation approuvée avec succès.', 'data' => new InsuranceClaimResource($result)]);
     }
 
     public function rejectClaim(Request $request, InsuranceClaim $claim, InsuranceService $insuranceService): JsonResponse
     {
         $request->validate(['processed_by' => ['required', 'integer', 'exists:users,id']]);
-
         $result = $insuranceService->rejectClaim($claim, $request->integer('processed_by'));
 
-        return response()->json(['message' => 'Réclamation rejetée.', 'data' => $result]);
+        return response()->json(['message' => 'Réclamation rejetée.', 'data' => new InsuranceClaimResource($result)]);
     }
 }

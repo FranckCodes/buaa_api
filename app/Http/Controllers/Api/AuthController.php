@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Requests\Auth\RegisterUserRequest;
+use App\Http\Resources\UserResource;
 use App\Services\UserService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -20,7 +21,7 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Utilisateur créé avec succès.',
-            'data'    => ['user' => $user->load('roles', 'status'), 'token' => $token],
+            'data'    => ['user' => new UserResource($user->load('roles', 'status')), 'token' => $token],
         ], 201);
     }
 
@@ -36,7 +37,7 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Connexion réussie.',
-            'data'    => ['user' => $user, 'token' => $token],
+            'data'    => ['user' => new UserResource($user), 'token' => $token],
         ]);
     }
 
@@ -44,7 +45,7 @@ class AuthController extends Controller
     {
         return response()->json([
             'message' => 'Utilisateur authentifié.',
-            'data'    => $request->user()->load('roles', 'status', 'clientProfile'),
+            'data'    => new UserResource($request->user()->load('roles', 'status', 'clientProfile')),
         ]);
     }
 

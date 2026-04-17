@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Adhesion\ApproveAdhesionRequestRequest;
 use App\Http\Requests\Adhesion\StoreAdhesionRequestRequest;
+use App\Http\Resources\AdhesionRequestResource;
+use App\Http\Resources\AdhesionResource;
 use App\Models\Adhesion;
 use App\Models\AdhesionRequest;
 use App\Models\Client;
@@ -17,21 +19,24 @@ class AdhesionController extends Controller
 {
     public function requestsIndex(): JsonResponse
     {
-        $items = AdhesionRequest::with(['activityType', 'structureType', 'treatedBy'])
-            ->latest()->paginate(15);
-
-        return response()->json(["message" => "Liste des demandes d'adhésion.", 'data' => $items]);
+        return AdhesionRequestResource::collection(
+            AdhesionRequest::with(['activityType', 'structureType', 'treatedBy'])->latest()->paginate(15)
+        )->additional(["message" => "Liste des demandes d'adhésion."])->response();
     }
 
     public function storeRequest(StoreAdhesionRequestRequest $request, AdhesionService $adhesionService): JsonResponse
     {
         $item = $adhesionService->createRequest($request->validated());
 
-        return response()->json(["message" => "Demande d'adhésion créée avec succès.", 'data' => $item], 201);
+        return response()->json([
+            "message" => "Demande d'adhésion créée avec succès.",
+            'data'    => new AdhesionRequestResource($item),
+        ], 201);
     }
 
     public function approveRequest(ApproveAdhesionRequestRequest $request, AdhesionRequest $adhesionRequest, AdhesionService $adhesionService): JsonResponse
     {
+        $this->authorize('approve', Adhesion::class);
         $data = $request->validated();
 
         $adhesion = $adhesionService->approveRequest(
@@ -43,30 +48,36 @@ class AdhesionController extends Controller
             $data['processed_by']
         );
 
-        return response()->json(["message" => "Demande d'adhésion approuvée avec succès.", 'data' => $adhesion]);
+        return response()->json([
+            "message" => "Demande d'adhésion approuvée avec succès.",
+            'data'    => new AdhesionResource($adhesion),
+        ]);
     }
 
     public function rejectRequest(Request $request, AdhesionRequest $adhesionRequest, AdhesionService $adhesionService): JsonResponse
     {
         $request->validate(['processed_by' => ['required', 'integer', 'exists:users,id']]);
-
         $item = $adhesionService->rejectRequest($adhesionRequest, $request->integer('processed_by'));
 
-        return response()->json(["message" => "Demande d'adhésion rejetée.", 'data' => $item]);
+        return response()->json(["message" => "Demande d'adhésion rejetée.", 'data' => new AdhesionRequestResource($item)]);
     }
 
     public function index(): JsonResponse
     {
-        $items = Adhesion::with(['client.user', 'union', 'type', 'status', 'paymentMode'])
-            ->latest()->paginate(15);
+        $this->authorize('viewAny', Adhesion::class);
 
-        return response()->json(['message' => 'Liste des adhésions.', 'data' => $items]);
+        return AdhesionResource::collection(
+            Adhesion::with(['client.user', 'union', 'type', 'status', 'paymentMode'])->latest()->paginate(15)
+        )->additional(['message' => 'Liste des adhésions.'])->response();
     }
 
     public function show(Adhesion $adhesion): JsonResponse
     {
-        $adhesion->load(['client.user', 'union', 'type', 'status', 'paymentMode', 'cotisations', 'documents']);
+        $this->authorize('view', $adhesion);
 
-        return response()->json(["message" => "Détail de l'adhésion.", 'data' => $adhesion]);
+        return response()->json([
+            "message" => "Détail de l'adhésion.",
+            'data'    => new AdhesionResource($adhesion->load(['client.user', 'union', 'type', 'status', 'paymentMode', 'cotisations', 'documents'])),
+        ]);
     }
 }
