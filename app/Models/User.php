@@ -164,4 +164,11 @@ class User extends Authenticatable
     {
         return $this->roles->whereIn('code', $codes)->isNotEmpty();
     }
+
+    public function isSuperAdmin(): bool { return $this->hasRole('super_admin'); }
+    public function isAdmin(): bool { return $this->hasRole('admin'); }
+    public function isSupervisor(): bool { return $this->hasRole('superviseur'); }
+    public function isClient(): bool { return $this->hasRole('client'); }
+    public function isAdminLike(): bool { return $this->hasAnyRole(['super_admin', 'admin']); }
+    public function isStaff(): bool { return $this->hasAnyRole(['super_admin', 'admin', 'superviseur']); }
 }

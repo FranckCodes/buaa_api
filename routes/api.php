@@ -47,60 +47,66 @@ Route::prefix('references')->group(function () {
     Route::get('payment-modes', [ReferenceController::class, 'paymentModes']);
 });
 
-// Routes protégées
-Route::middleware('auth:sanctum')->group(function () {
-
-    // Clients
+// Staff : admin / superviseur
+Route::middleware(['auth:sanctum', 'role:super_admin,admin,superviseur'])->group(function () {
     Route::get('clients', [ClientController::class, 'index']);
     Route::get('clients/{client}', [ClientController::class, 'show']);
-    Route::post('users/{user}/client-profile', [ClientController::class, 'storeProfile']);
-    Route::put('clients/{client}/profile', [ClientController::class, 'updateProfile']);
-
-    // Adhésions
     Route::get('adhesion-requests', [AdhesionController::class, 'requestsIndex']);
-    Route::post('adhesion-requests', [AdhesionController::class, 'storeRequest']);
-    Route::post('adhesion-requests/{adhesionRequest}/approve', [AdhesionController::class, 'approveRequest']);
-    Route::post('adhesion-requests/{adhesionRequest}/reject', [AdhesionController::class, 'rejectRequest']);
     Route::get('adhesions', [AdhesionController::class, 'index']);
     Route::get('adhesions/{adhesion}', [AdhesionController::class, 'show']);
-
-    // Crédits
     Route::get('credits', [CreditController::class, 'index']);
-    Route::post('credits', [CreditController::class, 'store']);
     Route::get('credits/{credit}', [CreditController::class, 'show']);
+    Route::get('insurances', [InsuranceController::class, 'index']);
+    Route::get('insurances/{insurance}', [InsuranceController::class, 'show']);
+    Route::get('insurance-claims', [InsuranceController::class, 'claimsIndex']);
+    Route::get('orders', [OrderController::class, 'index']);
+    Route::get('orders/{order}', [OrderController::class, 'show']);
+    Route::get('reports', [ReportController::class, 'index']);
+    Route::get('reports/{report}', [ReportController::class, 'show']);
+    Route::get('support-tickets', [SupportTicketController::class, 'index']);
+    Route::get('support-tickets/{supportTicket}', [SupportTicketController::class, 'show']);
+    Route::post('support-tickets/{supportTicket}/assign', [SupportTicketController::class, 'assign']);
+    Route::post('support-tickets/{supportTicket}/resolve', [SupportTicketController::class, 'resolve']);
+    Route::post('posts/{post}/moderate', [PostController::class, 'moderate']);
+    Route::post('adhesion-requests/{adhesionRequest}/approve', [AdhesionController::class, 'approveRequest']);
+    Route::post('adhesion-requests/{adhesionRequest}/reject', [AdhesionController::class, 'rejectRequest']);
+    Route::post('orders/{order}/approve', [OrderController::class, 'approve']);
+    Route::post('orders/{order}/reject', [OrderController::class, 'reject']);
+    Route::post('reports/{report}/moderate', [ReportController::class, 'moderate']);
+});
+
+// Admin seulement
+Route::middleware(['auth:sanctum', 'role:super_admin,admin'])->group(function () {
+    Route::post('users/{user}/client-profile', [ClientController::class, 'storeProfile']);
+    Route::put('clients/{client}/profile', [ClientController::class, 'updateProfile']);
     Route::post('credits/{credit}/approve', [CreditController::class, 'approve']);
     Route::post('credits/{credit}/reject', [CreditController::class, 'reject']);
     Route::post('credit-payments/{payment}/register', [CreditController::class, 'registerPayment']);
-
-    // Assurances
-    Route::get('insurances', [InsuranceController::class, 'index']);
-    Route::post('insurances', [InsuranceController::class, 'store']);
-    Route::get('insurances/{insurance}', [InsuranceController::class, 'show']);
     Route::post('insurances/{insurance}/activate', [InsuranceController::class, 'activate']);
-    Route::get('insurance-claims', [InsuranceController::class, 'claimsIndex']);
-    Route::post('insurance-claims', [InsuranceController::class, 'storeClaim']);
     Route::post('insurance-claims/{claim}/approve', [InsuranceController::class, 'approveClaim']);
     Route::post('insurance-claims/{claim}/reject', [InsuranceController::class, 'rejectClaim']);
-
-    // Commandes
-    Route::get('orders', [OrderController::class, 'index']);
-    Route::post('orders', [OrderController::class, 'store']);
-    Route::get('orders/{order}', [OrderController::class, 'show']);
-    Route::post('orders/{order}/approve', [OrderController::class, 'approve']);
-    Route::post('orders/{order}/reject', [OrderController::class, 'reject']);
     Route::post('orders/{order}/deliver', [OrderController::class, 'deliver']);
+    Route::post('support-tickets/{supportTicket}/close', [SupportTicketController::class, 'close']);
+    Route::delete('documents/{document}', [DocumentController::class, 'destroy']);
+});
 
-    // Rapports
-    Route::get('reports', [ReportController::class, 'index']);
+// Client seulement
+Route::middleware(['auth:sanctum', 'role:client'])->group(function () {
+    Route::post('credits', [CreditController::class, 'store']);
+    Route::post('orders', [OrderController::class, 'store']);
     Route::post('reports', [ReportController::class, 'store']);
-    Route::get('reports/{report}', [ReportController::class, 'show']);
-    Route::post('reports/{report}/moderate', [ReportController::class, 'moderate']);
+    Route::post('support-tickets', [SupportTicketController::class, 'store']);
+    Route::post('adhesion-requests', [AdhesionController::class, 'storeRequest']);
+    Route::post('insurances', [InsuranceController::class, 'store']);
+    Route::post('insurance-claims', [InsuranceController::class, 'storeClaim']);
+});
 
+// Tous les utilisateurs authentifiés
+Route::middleware('auth:sanctum')->group(function () {
     // Posts
     Route::get('posts', [PostController::class, 'index']);
-    Route::post('posts', [PostController::class, 'store']);
     Route::get('posts/{post}', [PostController::class, 'show']);
-    Route::post('posts/{post}/moderate', [PostController::class, 'moderate']);
+    Route::post('posts', [PostController::class, 'store']);
     Route::post('posts/{post}/like', [PostController::class, 'toggleLike']);
     Route::post('posts/{post}/save', [PostController::class, 'toggleSave']);
     Route::post('posts/{post}/comments', [PostController::class, 'addComment']);
@@ -112,15 +118,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('conversations/{conversation}/messages', [MessagingController::class, 'sendMessage']);
     Route::post('conversations/{conversation}/read', [MessagingController::class, 'markAsRead']);
 
-    // Support
-    Route::get('support-tickets', [SupportTicketController::class, 'index']);
-    Route::post('support-tickets', [SupportTicketController::class, 'store']);
-    Route::get('support-tickets/{supportTicket}', [SupportTicketController::class, 'show']);
-    Route::post('support-tickets/{supportTicket}/assign', [SupportTicketController::class, 'assign']);
-    Route::post('support-tickets/{supportTicket}/resolve', [SupportTicketController::class, 'resolve']);
-    Route::post('support-tickets/{supportTicket}/close', [SupportTicketController::class, 'close']);
-
     // Documents
     Route::post('documents/{type}/{id}', [DocumentController::class, 'attach']);
-    Route::delete('documents/{document}', [DocumentController::class, 'destroy']);
 });
