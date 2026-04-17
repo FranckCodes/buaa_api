@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Document\AttachDocumentRequest;
+use App\Http\Resources\DocumentResource;
 use App\Models\Adhesion;
 use App\Models\Client;
 use App\Models\Credit;
@@ -34,16 +35,18 @@ class DocumentController extends Controller
 
     public function attach(AttachDocumentRequest $request, string $type, int $id, DocumentService $documentService): JsonResponse
     {
+        $this->authorize('create', Document::class);
         $documentable = $this->resolveDocumentable($type, $id);
         $document = $documentService->attachTo($documentable, $request->validated());
 
-        return response()->json(['message' => 'Document attaché avec succès.', 'data' => $document], 201);
+        return $this->successResponse(new DocumentResource($document), 'Document attaché avec succès.', 201);
     }
 
     public function destroy(Document $document, DocumentService $documentService): JsonResponse
     {
+        $this->authorize('delete', $document);
         $documentService->deleteDocument($document);
 
-        return response()->json(['message' => 'Document supprimé avec succès.']);
+        return $this->successResponse(null, 'Document supprimé avec succès.');
     }
 }

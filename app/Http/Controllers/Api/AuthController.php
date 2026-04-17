@@ -19,40 +19,41 @@ class AuthController extends Controller
         $user = $userService->createUser($data, $data['role_codes']);
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json([
-            'message' => 'Utilisateur créé avec succès.',
-            'data'    => ['user' => new UserResource($user->load('roles', 'status')), 'token' => $token],
-        ], 201);
+        return $this->successResponse(
+            ['user' => new UserResource($user->load('roles', 'status')), 'token' => $token],
+            'Utilisateur créé avec succès.',
+            201
+        );
     }
 
     public function login(LoginRequest $request): JsonResponse
     {
         if (!Auth::attempt($request->validated())) {
-            return response()->json(['message' => 'Identifiants invalides.'], 422);
+            return $this->errorResponse('Identifiants invalides.', 422);
         }
 
         $user = $request->user()->load('roles', 'status', 'clientProfile');
         $user->update(['derniere_connexion' => now()]);
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json([
-            'message' => 'Connexion réussie.',
-            'data'    => ['user' => new UserResource($user), 'token' => $token],
-        ]);
+        return $this->successResponse(
+            ['user' => new UserResource($user), 'token' => $token],
+            'Connexion réussie.'
+        );
     }
 
     public function me(Request $request): JsonResponse
     {
-        return response()->json([
-            'message' => 'Utilisateur authentifié.',
-            'data'    => new UserResource($request->user()->load('roles', 'status', 'clientProfile')),
-        ]);
+        return $this->successResponse(
+            new UserResource($request->user()->load('roles', 'status', 'clientProfile')),
+            'Utilisateur authentifié.'
+        );
     }
 
     public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()?->delete();
 
-        return response()->json(['message' => 'Déconnexion réussie.']);
+        return $this->successResponse(null, 'Déconnexion réussie.');
     }
 }

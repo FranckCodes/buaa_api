@@ -16,57 +16,61 @@ class SupportTicketController extends Controller
     {
         $this->authorize('viewAny', SupportTicket::class);
 
-        return SupportTicketResource::collection(
-            SupportTicket::with(['client.user', 'category', 'treatedBy'])->latest()->paginate(15)
-        )->additional(['message' => 'Liste des tickets de support.'])->response();
+        return $this->paginatedResponse(
+            SupportTicket::with(['client.user', 'category', 'treatedBy'])->latest()->paginate(15),
+            'Liste des tickets récupérée avec succès.',
+            fn ($item) => new SupportTicketResource($item)
+        );
     }
 
     public function store(StoreSupportTicketRequest $request, SupportTicketService $supportTicketService): JsonResponse
     {
         $this->authorize('create', SupportTicket::class);
-        $ticket = $supportTicketService->createTicket($request->validated());
 
-        return response()->json([
-            'message' => 'Ticket créé avec succès.',
-            'data'    => new SupportTicketResource($ticket->load(['client.user', 'category'])),
-        ], 201);
+        return $this->successResponse(
+            new SupportTicketResource($supportTicketService->createTicket($request->validated())->load(['client.user', 'category'])),
+            'Ticket créé avec succès.',
+            201
+        );
     }
 
     public function show(SupportTicket $supportTicket): JsonResponse
     {
         $this->authorize('view', $supportTicket);
 
-        return response()->json([
-            'message' => 'Détail du ticket.',
-            'data'    => new SupportTicketResource($supportTicket->load(['client.user', 'category', 'treatedBy'])),
-        ]);
+        return $this->successResponse(
+            new SupportTicketResource($supportTicket->load(['client.user', 'category', 'treatedBy'])),
+            'Détail du ticket récupéré avec succès.'
+        );
     }
 
     public function assign(AssignSupportTicketRequest $request, SupportTicket $supportTicket, SupportTicketService $supportTicketService): JsonResponse
     {
         $this->authorize('assign', $supportTicket);
-        $ticket = $supportTicketService->assignTicket($supportTicket, $request->integer('agent_id'));
 
-        return response()->json(['message' => 'Ticket assigné avec succès.', 'data' => new SupportTicketResource($ticket)]);
+        return $this->successResponse(
+            new SupportTicketResource($supportTicketService->assignTicket($supportTicket, $request->integer('agent_id'))),
+            'Ticket assigné avec succès.'
+        );
     }
 
     public function resolve(SupportTicket $supportTicket, SupportTicketService $supportTicketService): JsonResponse
     {
         $this->authorize('resolve', $supportTicket);
 
-        return response()->json([
-            'message' => 'Ticket résolu avec succès.',
-            'data'    => new SupportTicketResource($supportTicketService->resolveTicket($supportTicket)),
-        ]);
+        return $this->successResponse(
+            new SupportTicketResource($supportTicketService->resolveTicket($supportTicket)),
+            'Ticket résolu avec succès.'
+        );
     }
 
     public function close(SupportTicket $supportTicket, SupportTicketService $supportTicketService): JsonResponse
     {
         $this->authorize('close', $supportTicket);
 
-        return response()->json([
-            'message' => 'Ticket fermé avec succès.',
-            'data'    => new SupportTicketResource($supportTicketService->closeTicket($supportTicket)),
-        ]);
+        return $this->successResponse(
+            new SupportTicketResource($supportTicketService->closeTicket($supportTicket)),
+            'Ticket fermé avec succès.'
+        );
     }
 }

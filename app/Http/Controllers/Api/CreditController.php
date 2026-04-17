@@ -17,51 +17,65 @@ class CreditController extends Controller
 {
     public function index(): JsonResponse
     {
-        return CreditResource::collection(
-            Credit::with(['client.user', 'type', 'status'])->latest()->paginate(15)
-        )->additional(['message' => 'Liste des crédits.'])->response();
+        $this->authorize('viewAny', Credit::class);
+
+        return $this->paginatedResponse(
+            Credit::with(['client.user', 'type', 'status'])->latest()->paginate(15),
+            'Liste des crédits récupérée avec succès.',
+            fn ($credit) => new CreditResource($credit)
+        );
     }
 
     public function store(StoreCreditRequest $request, CreditService $creditService): JsonResponse
     {
+        $this->authorize('create', Credit::class);
         $credit = $creditService->createCreditRequest($request->validated());
 
-        return response()->json([
-            'message' => 'Demande de crédit créée avec succès.',
-            'data'    => new CreditResource($credit->load(['client.user', 'type', 'status'])),
-        ], 201);
+        return $this->successResponse(
+            new CreditResource($credit->load(['client.user', 'type', 'status'])),
+            'Demande de crédit créée avec succès.',
+            201
+        );
     }
 
     public function show(Credit $credit): JsonResponse
     {
-        return response()->json([
-            'message' => 'Détail du crédit.',
-            'data'    => new CreditResource($credit->load(['client.user', 'type', 'status', 'treatedBy', 'payments', 'businessPlan', 'documents'])),
-        ]);
+        $this->authorize('view', $credit);
+
+        return $this->successResponse(
+            new CreditResource($credit->load(['client.user', 'type', 'status', 'treatedBy', 'payments', 'businessPlan', 'documents'])),
+            'Détail du crédit récupéré avec succès.'
+        );
     }
 
     public function approve(ApproveCreditRequest $request, Credit $credit, CreditService $creditService): JsonResponse
     {
         $this->authorize('approve', $credit);
-        $result = $creditService->approveCredit($credit, $request->validated());
 
-        return response()->json(['message' => 'Crédit approuvé avec succès.', 'data' => new CreditResource($result)]);
+        return $this->successResponse(
+            new CreditResource($creditService->approveCredit($credit, $request->validated())),
+            'Crédit approuvé avec succès.'
+        );
     }
 
     public function reject(Request $request, Credit $credit, CreditService $creditService): JsonResponse
     {
         $this->authorize('reject', $credit);
         $request->validate(['processed_by' => ['required', 'integer', 'exists:users,id']]);
-        $result = $creditService->rejectCredit($credit, $request->integer('processed_by'));
 
-        return response()->json(['message' => 'Crédit rejeté.', 'data' => new CreditResource($result)]);
+        return $this->successResponse(
+            new CreditResource($creditService->rejectCredit($credit, $request->integer('processed_by'))),
+            'Crédit rejeté.'
+        );
     }
 
     public function registerPayment(RegisterCreditPaymentRequest $request, CreditPayment $payment, CreditService $creditService): JsonResponse
     {
         $this->authorize('registerPayment', $payment->credit);
-        $result = $creditService->registerPayment($payment, $request->validated());
 
-        return response()->json(['message' => 'Paiement enregistré avec succès.', 'data' => $result]);
+        return $this->successResponse(
+            $creditService->registerPayment($payment, $request->validated()),
+            'Paiement enregistré avec succès.'
+        );
     }
 }

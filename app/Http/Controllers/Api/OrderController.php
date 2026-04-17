@@ -17,54 +17,62 @@ class OrderController extends Controller
     {
         $this->authorize('viewAny', Order::class);
 
-        return OrderResource::collection(
-            Order::with(['client.user', 'type', 'status'])->latest()->paginate(15)
-        )->additional(['message' => 'Liste des commandes.'])->response();
+        return $this->paginatedResponse(
+            Order::with(['client.user', 'type', 'status'])->latest()->paginate(15),
+            'Liste des commandes récupérée avec succès.',
+            fn ($item) => new OrderResource($item)
+        );
     }
 
     public function store(StoreOrderRequest $request, OrderService $orderService): JsonResponse
     {
         $this->authorize('create', Order::class);
-        $order = $orderService->createOrder($request->validated());
 
-        return response()->json([
-            'message' => 'Commande créée avec succès.',
-            'data'    => new OrderResource($order->load(['client.user', 'type', 'status'])),
-        ], 201);
+        return $this->successResponse(
+            new OrderResource($orderService->createOrder($request->validated())->load(['client.user', 'type', 'status'])),
+            'Commande créée avec succès.',
+            201
+        );
     }
 
     public function show(Order $order): JsonResponse
     {
         $this->authorize('view', $order);
 
-        return response()->json([
-            'message' => 'Détail de la commande.',
-            'data'    => new OrderResource($order->load(['client.user', 'type', 'status', 'treatedBy', 'trackingSteps', 'documents'])),
-        ]);
+        return $this->successResponse(
+            new OrderResource($order->load(['client.user', 'type', 'status', 'treatedBy', 'trackingSteps', 'documents'])),
+            'Détail de la commande récupéré avec succès.'
+        );
     }
 
     public function approve(ApproveOrderRequest $request, Order $order, OrderService $orderService): JsonResponse
     {
         $this->authorize('approve', $order);
-        $result = $orderService->approveOrder($order, $request->integer('processed_by'));
 
-        return response()->json(['message' => 'Commande approuvée avec succès.', 'data' => new OrderResource($result)]);
+        return $this->successResponse(
+            new OrderResource($orderService->approveOrder($order, $request->integer('processed_by'))),
+            'Commande approuvée avec succès.'
+        );
     }
 
     public function reject(Request $request, Order $order, OrderService $orderService): JsonResponse
     {
         $this->authorize('reject', $order);
         $request->validate(['processed_by' => ['required', 'integer', 'exists:users,id']]);
-        $result = $orderService->rejectOrder($order, $request->integer('processed_by'));
 
-        return response()->json(['message' => 'Commande rejetée.', 'data' => new OrderResource($result)]);
+        return $this->successResponse(
+            new OrderResource($orderService->rejectOrder($order, $request->integer('processed_by'))),
+            'Commande rejetée.'
+        );
     }
 
     public function deliver(Order $order, OrderService $orderService): JsonResponse
     {
         $this->authorize('deliver', $order);
-        $result = $orderService->markOrderDelivered($order);
 
-        return response()->json(['message' => 'Commande marquée comme livrée.', 'data' => new OrderResource($result)]);
+        return $this->successResponse(
+            new OrderResource($orderService->markOrderDelivered($order)),
+            'Commande marquée comme livrée.'
+        );
     }
 }

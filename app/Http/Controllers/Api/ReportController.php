@@ -16,30 +16,32 @@ class ReportController extends Controller
     {
         $this->authorize('viewAny', Report::class);
 
-        return ReportResource::collection(
-            Report::with(['client.user', 'superviseur', 'type', 'status'])->latest()->paginate(15)
-        )->additional(['message' => 'Liste des rapports.'])->response();
+        return $this->paginatedResponse(
+            Report::with(['client.user', 'superviseur', 'type', 'status'])->latest()->paginate(15),
+            'Liste des rapports récupérée avec succès.',
+            fn ($item) => new ReportResource($item)
+        );
     }
 
     public function store(StoreReportRequest $request, ReportService $reportService): JsonResponse
     {
         $this->authorize('create', Report::class);
-        $report = $reportService->createReport($request->validated());
 
-        return response()->json([
-            'message' => 'Rapport créé avec succès.',
-            'data'    => new ReportResource($report->load(['client.user', 'type', 'status'])),
-        ], 201);
+        return $this->successResponse(
+            new ReportResource($reportService->createReport($request->validated())->load(['client.user', 'type', 'status'])),
+            'Rapport créé avec succès.',
+            201
+        );
     }
 
     public function show(Report $report): JsonResponse
     {
         $this->authorize('view', $report);
 
-        return response()->json([
-            'message' => 'Détail du rapport.',
-            'data'    => new ReportResource($report->load(['client.user', 'superviseur', 'type', 'status', 'validatedBy', 'documents'])),
-        ]);
+        return $this->successResponse(
+            new ReportResource($report->load(['client.user', 'superviseur', 'type', 'status', 'validatedBy', 'documents'])),
+            'Détail du rapport récupéré avec succès.'
+        );
     }
 
     public function moderate(ModerateReportRequest $request, Report $report, ReportService $reportService): JsonResponse
@@ -53,6 +55,6 @@ class ReportController extends Controller
             'reject'   => $reportService->rejectReport($report, $data['validator_id'], $data['reason'] ?? null),
         };
 
-        return response()->json(['message' => 'Action sur le rapport effectuée avec succès.', 'data' => new ReportResource($result)]);
+        return $this->successResponse(new ReportResource($result), 'Action sur le rapport effectuée avec succès.');
     }
 }

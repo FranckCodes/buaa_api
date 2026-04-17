@@ -16,32 +16,32 @@ class ClientController extends Controller
     {
         $this->authorize('viewAny', Client::class);
 
-        return ClientResource::collection(
-            Client::with(['user', 'activityType', 'structureType', 'superviseur'])->latest()->paginate(15)
-        )->additional(['message' => 'Liste des clients.'])->response();
+        return $this->paginatedResponse(
+            Client::with(['user', 'activityType', 'structureType', 'superviseur'])->latest()->paginate(15),
+            'Liste des clients récupérée avec succès.',
+            fn ($client) => new ClientResource($client)
+        );
     }
 
     public function show(Client $client): JsonResponse
     {
         $this->authorize('view', $client);
 
-        return response()->json([
-            'message' => 'Détail du client.',
-            'data'    => new ClientResource($client->load([
-                'user', 'activityType', 'structureType', 'superviseur',
-                'adhesions', 'credits', 'insurances', 'orders', 'reports', 'supportTickets',
-            ])),
-        ]);
+        return $this->successResponse(
+            new ClientResource($client->load(['user', 'activityType', 'structureType', 'superviseur', 'adhesions', 'credits', 'insurances', 'orders', 'reports', 'supportTickets'])),
+            'Détail du client récupéré avec succès.'
+        );
     }
 
     public function storeProfile(StoreClientProfileRequest $request, User $user, ClientService $clientService): JsonResponse
     {
         $client = $clientService->createClientProfile($user, $request->validated());
 
-        return response()->json([
-            'message' => 'Profil client enregistré avec succès.',
-            'data'    => new ClientResource($client->load(['user', 'activityType', 'structureType', 'superviseur'])),
-        ], 201);
+        return $this->successResponse(
+            new ClientResource($client->load(['user', 'activityType', 'structureType', 'superviseur'])),
+            'Profil client enregistré avec succès.',
+            201
+        );
     }
 
     public function updateProfile(StoreClientProfileRequest $request, Client $client, ClientService $clientService): JsonResponse
@@ -49,9 +49,9 @@ class ClientController extends Controller
         $this->authorize('update', $client);
         $updated = $clientService->createClientProfile($client->user, $request->validated());
 
-        return response()->json([
-            'message' => 'Profil client mis à jour avec succès.',
-            'data'    => new ClientResource($updated->load(['user', 'activityType', 'structureType', 'superviseur'])),
-        ]);
+        return $this->successResponse(
+            new ClientResource($updated->load(['user', 'activityType', 'structureType', 'superviseur'])),
+            'Profil client mis à jour avec succès.'
+        );
     }
 }
