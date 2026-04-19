@@ -12,7 +12,7 @@ class StoreOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'client_id'       => ['required', 'integer', 'exists:clients,id'],
+            'client_id'       => ['required', 'string', 'exists:clients,id'],
             'order_type_id'   => ['required', 'integer', 'exists:order_types,id'],
             'montant'         => ['nullable', 'numeric', 'min:0'],
             'description'     => ['nullable', 'string'],

@@ -17,7 +17,7 @@ class StoreOrderTest extends TestCase
         $this->seed();
 
         $user   = $this->createUserWithRole('client');
-        $client = Client::factory()->create(['user_id' => $user->id]);
+        $client = Client::factory()->create(['id' => $user->id]);
         $type   = OrderType::firstOrFail();
 
         $this->actingAs($user, 'sanctum')

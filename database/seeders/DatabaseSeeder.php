@@ -15,6 +15,8 @@ class DatabaseSeeder extends Seeder
             ClientStructureTypeSeeder::class,
             CreditTypeSeeder::class,
             CreditStatusSeeder::class,
+            OrderTypeSeeder::class,
+            OrderStatusSeeder::class,
             SuperAdminSeeder::class,
         ]);
     }

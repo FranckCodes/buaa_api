@@ -9,11 +9,15 @@ return new class extends Migration {
     {
         Schema::create('order_tracking', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('order_id')->constrained('orders')->cascadeOnDelete();
+
+            $table->string('order_id');
+            $table->foreign('order_id')->references('id')->on('orders')->cascadeOnDelete();
+
             $table->string('label');
             $table->boolean('done')->default(false);
             $table->date('date_done')->nullable();
             $table->unsignedInteger('ordre');
+
             $table->timestamps();
 
             $table->unique(['order_id', 'ordre']);

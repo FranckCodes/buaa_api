@@ -11,7 +11,7 @@ class ApproveOrderRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'processed_by' => ['required', 'integer', 'exists:users,id'],
+            'processed_by' => ['required', 'string', 'exists:users,id'],
         ];
     }
 }

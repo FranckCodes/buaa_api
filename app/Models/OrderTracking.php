@@ -11,7 +11,10 @@ class OrderTracking extends Model
 
     protected $fillable = ['order_id', 'label', 'done', 'date_done', 'ordre'];
 
-    protected $casts = ['done' => 'boolean', 'date_done' => 'date'];
+    protected $casts = [
+        'done'      => 'boolean',
+        'date_done' => 'date',
+    ];
 
     public function order(): BelongsTo { return $this->belongsTo(Order::class); }
 }

@@ -18,9 +18,9 @@ class OrderController extends Controller
         $this->authorize('viewAny', Order::class);
 
         return $this->paginatedResponse(
-            Order::with(['client.user', 'type', 'status'])->latest()->paginate(15),
+            Order::with(['client.user', 'type', 'status', 'treatedBy'])->latest()->paginate(15),
             'Liste des commandes récupérée avec succès.',
-            fn ($item) => new OrderResource($item)
+            fn ($order) => new OrderResource($order)
         );
     }
 
@@ -28,8 +28,10 @@ class OrderController extends Controller
     {
         $this->authorize('create', Order::class);
 
+        $order = $orderService->createOrder($request->validated());
+
         return $this->successResponse(
-            new OrderResource($orderService->createOrder($request->validated())->load(['client.user', 'type', 'status'])),
+            new OrderResource($order->load(['client.user', 'type', 'status'])),
             'Commande créée avec succès.',
             201
         );
@@ -40,7 +42,7 @@ class OrderController extends Controller
         $this->authorize('view', $order);
 
         return $this->successResponse(
-            new OrderResource($order->load(['client.user', 'type', 'status', 'treatedBy', 'trackingSteps', 'documents'])),
+            new OrderResource($order->load(['client.user', 'type', 'status', 'treatedBy', 'trackingSteps'])),
             'Détail de la commande récupéré avec succès.'
         );
     }
@@ -50,7 +52,7 @@ class OrderController extends Controller
         $this->authorize('approve', $order);
 
         return $this->successResponse(
-            new OrderResource($orderService->approveOrder($order, $request->integer('processed_by'))),
+            new OrderResource($orderService->approveOrder($order, $request->string('processed_by')->toString())),
             'Commande approuvée avec succès.'
         );
     }
@@ -58,11 +60,11 @@ class OrderController extends Controller
     public function reject(Request $request, Order $order, OrderService $orderService): JsonResponse
     {
         $this->authorize('reject', $order);
-        $request->validate(['processed_by' => ['required', 'integer', 'exists:users,id']]);
+        $request->validate(['processed_by' => ['required', 'string', 'exists:users,id']]);
 
         return $this->successResponse(
-            new OrderResource($orderService->rejectOrder($order, $request->integer('processed_by'))),
-            'Commande rejetée.'
+            new OrderResource($orderService->rejectOrder($order, $request->string('processed_by')->toString())),
+            'Commande rejetée avec succès.'
         );
     }
 

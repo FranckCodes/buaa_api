@@ -18,7 +18,7 @@ class OrderPolicy
     {
         if ($user->isAdminLike()) return true;
         if ($user->isSupervisor() && $order->client?->superviseur_id === $user->id) return true;
-        return $user->id === $order->client?->user_id;
+        return $user->id === $order->client_id;
     }
 
     public function create(User $user): bool { return $user->isClient() || $user->isAdminLike(); }
