@@ -7,6 +7,7 @@ use App\Models\Reference\OrderType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Order extends Model
 {
@@ -30,4 +31,9 @@ class Order extends Model
     public function status(): BelongsTo { return $this->belongsTo(OrderStatus::class, 'order_status_id'); }
     public function treatedBy(): BelongsTo { return $this->belongsTo(User::class, 'traite_par'); }
     public function trackingSteps(): HasMany { return $this->hasMany(OrderTracking::class); }
+
+    public function documents(): MorphMany
+    {
+        return $this->morphMany(Document::class, 'documentable');
+    }
 }

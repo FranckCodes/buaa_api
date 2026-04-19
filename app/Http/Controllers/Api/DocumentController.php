@@ -19,7 +19,7 @@ use Illuminate\Http\JsonResponse;
 
 class DocumentController extends Controller
 {
-    protected function resolveDocumentable(string $type, int $id): Model
+    protected function resolveDocumentable(string $type, string $id): Model
     {
         return match ($type) {
             'client'    => Client::findOrFail($id),
@@ -33,18 +33,34 @@ class DocumentController extends Controller
         };
     }
 
-    public function attach(AttachDocumentRequest $request, string $type, int $id, DocumentService $documentService): JsonResponse
+    public function attach(AttachDocumentRequest $request, string $type, string $id, DocumentService $documentService): JsonResponse
     {
         $this->authorize('create', Document::class);
-        $documentable = $this->resolveDocumentable($type, $id);
-        $document = $documentService->attachTo($documentable, $request->validated());
 
-        return $this->successResponse(new DocumentResource($document), 'Document attaché avec succès.', 201);
+        $documentable = $this->resolveDocumentable($type, $id);
+        $document     = $documentService->attachTo($documentable, $request->validated());
+
+        return $this->successResponse(
+            new DocumentResource($document->load('uploadedBy')),
+            'Document attaché avec succès.',
+            201
+        );
+    }
+
+    public function show(Document $document): JsonResponse
+    {
+        $this->authorize('view', $document);
+
+        return $this->successResponse(
+            new DocumentResource($document->load('uploadedBy')),
+            'Détail du document récupéré avec succès.'
+        );
     }
 
     public function destroy(Document $document, DocumentService $documentService): JsonResponse
     {
         $this->authorize('delete', $document);
+
         $documentService->deleteDocument($document);
 
         return $this->successResponse(null, 'Document supprimé avec succès.');

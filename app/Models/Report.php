@@ -6,6 +6,7 @@ use App\Models\Reference\ReportStatus;
 use App\Models\Reference\ReportType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Report extends Model
 {
@@ -28,4 +29,9 @@ class Report extends Model
     public function type(): BelongsTo { return $this->belongsTo(ReportType::class, 'report_type_id'); }
     public function status(): BelongsTo { return $this->belongsTo(ReportStatus::class, 'report_status_id'); }
     public function validatedBy(): BelongsTo { return $this->belongsTo(User::class, 'valide_par'); }
+
+    public function documents(): MorphMany
+    {
+        return $this->morphMany(Document::class, 'documentable');
+    }
 }

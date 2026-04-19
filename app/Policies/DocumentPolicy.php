@@ -21,17 +21,22 @@ class DocumentPolicy
         if ($user->isAdminLike()) return true;
 
         if ($parent instanceof Client) {
-            return $parent->user_id === $user->id;
+            if ($parent->id === $user->id) return true;
+            return $user->isSupervisor() && $parent->superviseur_id === $user->id;
         }
 
-        if (isset($parent->client_id)) {
-            if ($parent->client?->user_id === $user->id) return true;
-            if ($parent->client?->superviseur_id === $user->id) return true;
-        }
+        if (isset($parent->client_id) && $parent->client_id === $user->id) return true;
+
+        if (method_exists($parent, 'client') && $parent->client?->superviseur_id === $user->id) return true;
 
         return false;
     }
 
     public function create(User $user): bool { return $user->isClient() || $user->isStaff(); }
-    public function delete(User $user): bool { return $user->isAdminLike(); }
+
+    public function delete(User $user, Document $document): bool
+    {
+        if ($user->isAdminLike()) return true;
+        return $document->uploaded_by === $user->id;
+    }
 }

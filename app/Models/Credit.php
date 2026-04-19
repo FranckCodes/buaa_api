@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Credit extends Model
 {
@@ -43,4 +44,9 @@ class Credit extends Model
     public function treatedBy(): BelongsTo { return $this->belongsTo(User::class, 'traite_par'); }
     public function payments(): HasMany { return $this->hasMany(CreditPayment::class); }
     public function businessPlan(): HasOne { return $this->hasOne(BusinessPlan::class); }
+
+    public function documents(): MorphMany
+    {
+        return $this->morphMany(Document::class, 'documentable');
+    }
 }

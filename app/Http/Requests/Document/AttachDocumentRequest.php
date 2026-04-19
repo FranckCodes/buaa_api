@@ -16,7 +16,7 @@ class AttachDocumentRequest extends FormRequest
             'url'           => ['required', 'string', 'max:500'],
             'taille_bytes'  => ['nullable', 'integer', 'min:0'],
             'mime_type'     => ['nullable', 'string', 'max:100'],
-            'uploaded_by'   => ['nullable', 'integer', 'exists:users,id'],
+            'uploaded_by'   => ['nullable', 'string', 'exists:users,id'],
         ];
     }
 }

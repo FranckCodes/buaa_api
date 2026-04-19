@@ -126,7 +126,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('conversations/{conversation}/messages', [MessagingController::class, 'sendMessage']);
     Route::post('conversations/{conversation}/read', [MessagingController::class, 'markAsRead']);
 
+    // Documents
     Route::post('documents/{type}/{id}', [DocumentController::class, 'attach']);
+    Route::get('documents/{document}', [DocumentController::class, 'show']);
+    Route::delete('documents/{document}', [DocumentController::class, 'destroy']);
 
     // Conversations
     Route::get('conversations', [MessagingController::class, 'index']);

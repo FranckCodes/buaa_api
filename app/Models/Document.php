@@ -13,6 +13,8 @@ class Document extends Model
         'nom_fichier', 'url', 'taille_bytes', 'mime_type', 'uploaded_by',
     ];
 
+    protected $casts = ['taille_bytes' => 'integer'];
+
     public function documentable(): MorphTo { return $this->morphTo(); }
     public function uploadedBy(): BelongsTo { return $this->belongsTo(User::class, 'uploaded_by'); }
 }
