@@ -158,6 +158,18 @@ class User extends Authenticatable
         return $this->hasMany(Document::class, 'uploaded_by');
     }
 
+    public function conversations(): BelongsToMany
+    {
+        return $this->belongsToMany(Conversation::class, 'conversation_participants', 'user_id', 'conversation_id')
+            ->withPivot('unread_count', 'last_read_at')
+            ->withTimestamps();
+    }
+
+    public function sentMessages(): HasMany
+    {
+        return $this->hasMany(Message::class, 'sender_id');
+    }
+
     public function hasRole(string $code): bool
     {
         return $this->roles->contains('code', $code);

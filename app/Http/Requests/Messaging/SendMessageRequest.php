@@ -12,7 +12,7 @@ class SendMessageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'sender_id'           => ['required', 'integer', 'exists:users,id'],
+            'sender_id'           => ['required', 'string', 'exists:users,id'],
             'text'                => ['nullable', 'string'],
             'type'                => ['nullable', Rule::in(['text', 'image', 'file'])],
             'image_url'           => ['nullable', 'string', 'max:500'],

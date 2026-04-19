@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\DocumentController;
 use App\Http\Controllers\Api\InsuranceController;
 use App\Http\Controllers\Api\MessagingController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\MessagingController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\ReferenceController;
@@ -126,4 +127,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('conversations/{conversation}/read', [MessagingController::class, 'markAsRead']);
 
     Route::post('documents/{type}/{id}', [DocumentController::class, 'attach']);
+
+    // Conversations
+    Route::get('conversations', [MessagingController::class, 'index']);
+    Route::post('conversations', [MessagingController::class, 'startConversation']);
+    Route::get('conversations/{conversation}', [MessagingController::class, 'show']);
+    Route::post('conversations/{conversation}/messages', [MessagingController::class, 'sendMessage']);
+    Route::post('conversations/{conversation}/read', [MessagingController::class, 'markAsRead']);
 });

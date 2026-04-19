@@ -12,7 +12,7 @@ class StartConversationRequest extends FormRequest
     {
         return [
             'participant_ids'   => ['required', 'array', 'min:2'],
-            'participant_ids.*' => ['integer', 'exists:users,id'],
+            'participant_ids.*' => ['string', 'exists:users,id'],
         ];
     }
 }

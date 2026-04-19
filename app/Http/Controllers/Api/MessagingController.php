@@ -17,14 +17,17 @@ class MessagingController extends Controller
 {
     public function index(Request $request, MessagingService $messagingService): JsonResponse
     {
-        $request->validate(['user_id' => ['required', 'integer', 'exists:users,id']]);
-        $items = $messagingService->getUserInbox($request->integer('user_id'));
-
-        return $this->successResponse(ConversationResource::collection($items), 'Boîte de réception récupérée avec succès.');
+        return $this->paginatedResponse(
+            $messagingService->getUserInbox($request->user()->id),
+            'Conversations récupérées avec succès.',
+            fn ($conversation) => new ConversationResource($conversation)
+        );
     }
 
     public function startConversation(StartConversationRequest $request, MessagingService $messagingService): JsonResponse
     {
+        $this->authorize('create', Conversation::class);
+
         $conversation = $messagingService->startConversation($request->validated()['participant_ids']);
 
         return $this->successResponse(new ConversationResource($conversation), 'Conversation créée avec succès.', 201);
@@ -34,28 +37,31 @@ class MessagingController extends Controller
     {
         $this->authorize('view', $conversation);
 
-        return $this->successResponse(
-            new ConversationResource($conversation->load(['participants', 'messages.sender', 'messages.replyTo'])),
-            'Détail de la conversation récupéré avec succès.'
-        );
+        $conversation->load([
+            'participants',
+            'participantRows',
+            'messages.sender',
+            'messages.replyTo',
+        ]);
+
+        return $this->successResponse(new ConversationResource($conversation), 'Détail de la conversation récupéré avec succès.');
     }
 
     public function sendMessage(SendMessageRequest $request, Conversation $conversation, MessagingService $messagingService): JsonResponse
     {
         $this->authorize('sendMessage', $conversation);
-        $data = $request->validated();
 
-        return $this->successResponse(
-            new MessageResource($messagingService->sendMessage($conversation, $data['sender_id'], $data)),
-            'Message envoyé avec succès.',
-            201
-        );
+        $data    = $request->validated();
+        $message = $messagingService->sendMessage($conversation, $data['sender_id'], $data);
+
+        return $this->successResponse(new MessageResource($message), 'Message envoyé avec succès.', 201);
     }
 
     public function markAsRead(MarkConversationAsReadRequest $request, Conversation $conversation, MessagingService $messagingService): JsonResponse
     {
         $this->authorize('markAsRead', $conversation);
-        $messagingService->markAsRead($conversation, $request->integer('user_id'));
+
+        $messagingService->markAsRead($conversation, $request->string('user_id')->toString());
 
         return $this->successResponse(null, 'Conversation marquée comme lue.');
     }

@@ -33,9 +33,9 @@ class AuthServiceProvider extends ServiceProvider
         SupportTicket::class => SupportTicketPolicy::class,
         Post::class          => PostPolicy::class,
         Notification::class  => NotificationPolicy::class,
+        Conversation::class  => ConversationPolicy::class,
         Adhesion::class      => AdhesionPolicy::class,
         Insurance::class     => InsurancePolicy::class,
-        Conversation::class  => ConversationPolicy::class,
         Document::class      => DocumentPolicy::class,
     ];
 

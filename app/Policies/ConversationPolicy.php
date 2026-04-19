@@ -16,16 +16,16 @@ class ConversationPolicy
 
     public function view(User $user, Conversation $conversation): bool
     {
-        return $conversation->participants()->where('user_id', $user->id)->exists();
+        return $conversation->participants()->where('users.id', $user->id)->exists();
     }
 
     public function sendMessage(User $user, Conversation $conversation): bool
     {
-        return $conversation->participants()->where('user_id', $user->id)->exists();
+        return $conversation->participants()->where('users.id', $user->id)->exists();
     }
 
     public function markAsRead(User $user, Conversation $conversation): bool
     {
-        return $conversation->participants()->where('user_id', $user->id)->exists();
+        return $conversation->participants()->where('users.id', $user->id)->exists();
     }
 }
