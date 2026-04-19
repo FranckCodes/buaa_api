@@ -1,0 +1,118 @@
+# Support Tickets paths
+/support-tickets:
+  get:
+    tags: [Support Tickets]
+    summary: Liste des tickets
+    description: "**Rôles autorisés :** admin, superviseur"
+    security:
+      - sanctumAuth: []
+    responses:
+      '200':
+        description: Liste paginée des tickets
+  post:
+    tags: [Support Tickets]
+    summary: Créer un ticket
+    description: "**Rôles autorisés :** client, admin"
+    security:
+      - sanctumAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [client_id, support_category_id, sujet]
+            properties:
+              client_id:
+                type: string
+              support_category_id:
+                type: integer
+              sujet:
+                type: string
+              description:
+                type: string
+                nullable: true
+    responses:
+      '201':
+        $ref: '#/components/responses/Created'
+
+/support-tickets/{supportTicket}:
+  get:
+    tags: [Support Tickets]
+    summary: Détail d'un ticket
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: supportTicket
+        in: path
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        $ref: '#/components/responses/Success'
+
+/support-tickets/{supportTicket}/assign:
+  post:
+    tags: [Support Tickets]
+    summary: Assigner un ticket à un agent
+    description: "**Rôles autorisés :** admin, superviseur"
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: supportTicket
+        in: path
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [agent_id]
+            properties:
+              agent_id:
+                type: string
+    responses:
+      '200':
+        $ref: '#/components/responses/Success'
+      '422':
+        $ref: '#/components/responses/BusinessError'
+
+/support-tickets/{supportTicket}/resolve:
+  post:
+    tags: [Support Tickets]
+    summary: Résoudre un ticket
+    description: "**Rôles autorisés :** admin, superviseur"
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: supportTicket
+        in: path
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        $ref: '#/components/responses/Success'
+
+/support-tickets/{supportTicket}/close:
+  post:
+    tags: [Support Tickets]
+    summary: Fermer un ticket
+    description: "**Rôles autorisés :** admin, super_admin"
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: supportTicket
+        in: path
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        $ref: '#/components/responses/Success'
+      '422':
+        $ref: '#/components/responses/BusinessError'

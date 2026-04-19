@@ -1,0 +1,127 @@
+# Dashboard paths
+/dashboard/admin/overview:
+  get:
+    tags: [Dashboard]
+    summary: Vue globale admin
+    description: "**Rôles autorisés :** admin, super_admin"
+    security:
+      - sanctumAuth: []
+    responses:
+      '200':
+        description: Statistiques complètes
+        content:
+          application/json:
+            example:
+              success: true
+              message: Vue d'ensemble admin récupérée avec succès.
+              data:
+                users:
+                  total: 120
+                  clients: 95
+                  staff: 25
+                credits:
+                  total: 40
+                  en_analyse: 12
+                  actifs: 20
+                  montant_demande_total: 15000
+              meta: null
+              errors: null
+      '403':
+        $ref: '#/components/responses/Forbidden'
+
+/dashboard/admin/trends:
+  get:
+    tags: [Dashboard]
+    summary: Tendances mensuelles admin
+    description: "**Rôles autorisés :** admin, super_admin"
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: months
+        in: query
+        required: false
+        schema:
+          type: integer
+          default: 6
+          minimum: 1
+          maximum: 24
+        example: 6
+    responses:
+      '200':
+        description: Tendances par module
+        content:
+          application/json:
+            example:
+              success: true
+              data:
+                credits:
+                  - period: "2026-01"
+                    total: 3
+                  - period: "2026-02"
+                    total: 5
+                orders:
+                  - period: "2026-01"
+                    total: 7
+
+/dashboard/admin/kpis:
+  get:
+    tags: [Dashboard]
+    summary: KPIs rapides admin (cartes)
+    description: "**Rôles autorisés :** admin, super_admin"
+    security:
+      - sanctumAuth: []
+    responses:
+      '200':
+        description: Liste de KPIs
+        content:
+          application/json:
+            example:
+              success: true
+              data:
+                - key: clients_total
+                  label: Clients
+                  value: 95
+                - key: credits_actifs
+                  label: Crédits actifs
+                  value: 20
+
+/dashboard/admin/recent-activity:
+  get:
+    tags: [Dashboard]
+    summary: Activité récente admin
+    description: "**Rôles autorisés :** admin, super_admin"
+    security:
+      - sanctumAuth: []
+    responses:
+      '200':
+        description: Derniers crédits, commandes, rapports, tickets
+
+/dashboard/supervisor/overview:
+  get:
+    tags: [Dashboard]
+    summary: Vue dashboard superviseur
+    description: |
+      **Rôles autorisés :** admin, superviseur
+      Retourne les statistiques filtrées sur le portefeuille du superviseur connecté.
+    security:
+      - sanctumAuth: []
+    responses:
+      '200':
+        description: Statistiques portefeuille
+      '403':
+        $ref: '#/components/responses/Forbidden'
+
+/dashboard/client/overview:
+  get:
+    tags: [Dashboard]
+    summary: Vue dashboard client
+    description: |
+      **Rôles autorisés :** client
+      Retourne les statistiques personnelles du client connecté.
+    security:
+      - sanctumAuth: []
+    responses:
+      '200':
+        description: Statistiques personnelles
+      '403':
+        $ref: '#/components/responses/Forbidden'

@@ -1,0 +1,208 @@
+# Credits paths
+/credits:
+  get:
+    tags: [Credits]
+    summary: Liste des crédits
+    description: |
+      **Rôles autorisés :** admin, super_admin, superviseur (portefeuille uniquement)
+    security:
+      - sanctumAuth: []
+    responses:
+      '200':
+        description: Liste paginée
+        content:
+          application/json:
+            example:
+              success: true
+              message: Liste des crédits récupérée avec succès.
+              data: []
+              meta:
+                current_page: 1
+                last_page: 1
+                per_page: 15
+                total: 0
+              errors: null
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+  post:
+    tags: [Credits]
+    summary: Créer une demande de crédit
+    description: |
+      **Rôles autorisés :** client
+    security:
+      - sanctumAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [client_id, credit_type_id, montant_demande, duree_mois]
+            properties:
+              client_id:
+                type: string
+                example: CLT-45678
+              credit_type_id:
+                type: integer
+                example: 1
+              montant_demande:
+                type: number
+                format: float
+                example: 1200
+              duree_mois:
+                type: integer
+                example: 6
+              taux_interet:
+                type: number
+                format: float
+                nullable: true
+              objet_credit:
+                type: string
+                nullable: true
+                example: Achat de matériel agricole
+              description_projet:
+                type: string
+                nullable: true
+              revenus_mensuels:
+                type: number
+                format: float
+                nullable: true
+    responses:
+      '201':
+        $ref: '#/components/responses/Created'
+      '422':
+        $ref: '#/components/responses/ValidationError'
+
+/credits/{credit}:
+  get:
+    tags: [Credits]
+    summary: Détail d'un crédit
+    description: |
+      **Rôles autorisés :** admin, superviseur (portefeuille), client (propre crédit)
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: credit
+        in: path
+        required: true
+        schema:
+          type: string
+        example: CRD-20260419-ABCD
+    responses:
+      '200':
+        $ref: '#/components/responses/Success'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+
+/credits/{credit}/approve:
+  post:
+    tags: [Credits]
+    summary: Approuver un crédit
+    description: |
+      **Rôles autorisés :** admin, super_admin
+      Génère automatiquement le calendrier de remboursement.
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: credit
+        in: path
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [montant_approuve, traite_par]
+            properties:
+              montant_approuve:
+                type: number
+                format: float
+                example: 1000
+              montant_echeance:
+                type: number
+                format: float
+                nullable: true
+                example: 166.67
+              prochaine_echeance:
+                type: string
+                format: date
+                nullable: true
+              traite_par:
+                type: string
+                example: ADM-001
+    responses:
+      '200':
+        $ref: '#/components/responses/Success'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '422':
+        $ref: '#/components/responses/BusinessError'
+
+/credits/{credit}/reject:
+  post:
+    tags: [Credits]
+    summary: Rejeter un crédit
+    description: |
+      **Rôles autorisés :** admin, super_admin
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: credit
+        in: path
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [processed_by]
+            properties:
+              processed_by:
+                type: string
+                example: ADM-001
+    responses:
+      '200':
+        $ref: '#/components/responses/Success'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+
+/credit-payments/{payment}/register:
+  post:
+    tags: [Credits]
+    summary: Enregistrer un paiement d'échéance
+    description: |
+      **Rôles autorisés :** admin, super_admin
+      Met à jour automatiquement le statut du crédit si toutes les échéances sont payées.
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: payment
+        in: path
+        required: true
+        schema:
+          type: integer
+    requestBody:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              date_paiement:
+                type: string
+                format: date
+                nullable: true
+    responses:
+      '200':
+        $ref: '#/components/responses/Success'
+      '422':
+        $ref: '#/components/responses/BusinessError'

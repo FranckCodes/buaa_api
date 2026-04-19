@@ -1,0 +1,100 @@
+# Reports paths
+/reports:
+  get:
+    tags: [Reports]
+    summary: Liste des rapports
+    description: "**Rôles autorisés :** admin, superviseur"
+    security:
+      - sanctumAuth: []
+    responses:
+      '200':
+        description: Liste paginée des rapports
+  post:
+    tags: [Reports]
+    summary: Créer un rapport
+    description: "**Rôles autorisés :** client, admin"
+    security:
+      - sanctumAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [client_id, report_type_id, date_rapport]
+            properties:
+              client_id:
+                type: string
+              superviseur_id:
+                type: string
+                nullable: true
+              report_type_id:
+                type: integer
+              summary:
+                type: string
+                nullable: true
+              value_numeric:
+                type: number
+                format: float
+                nullable: true
+              value_unit:
+                type: string
+                nullable: true
+              date_rapport:
+                type: string
+                format: date
+    responses:
+      '201':
+        $ref: '#/components/responses/Created'
+
+/reports/{report}:
+  get:
+    tags: [Reports]
+    summary: Détail d'un rapport
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: report
+        in: path
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        $ref: '#/components/responses/Success'
+
+/reports/{report}/moderate:
+  post:
+    tags: [Reports]
+    summary: Modérer un rapport (valider / révision / rejeter)
+    description: |
+      **Rôles autorisés :** admin, superviseur (si assigné)
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: report
+        in: path
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [action, validator_id]
+            properties:
+              action:
+                type: string
+                enum: [validate, revision, reject]
+              validator_id:
+                type: string
+              reason:
+                type: string
+                nullable: true
+    responses:
+      '200':
+        $ref: '#/components/responses/Success'
+      '422':
+        $ref: '#/components/responses/BusinessError'
