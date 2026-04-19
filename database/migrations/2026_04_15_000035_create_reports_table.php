@@ -9,8 +9,10 @@ return new class extends Migration {
     {
         Schema::create('reports', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('client_id')->constrained('clients')->cascadeOnDelete();
-            $table->foreignId('superviseur_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->string('client_id');
+            $table->foreign('client_id')->references('id')->on('clients')->cascadeOnDelete();
+            $table->string('superviseur_id')->nullable();
+            $table->foreign('superviseur_id')->references('id')->on('users')->nullOnDelete();
             $table->foreignId('report_type_id')->constrained('report_types');
             $table->foreignId('report_status_id')->constrained('report_statuses');
             $table->string('summary', 300)->nullable();
@@ -19,7 +21,8 @@ return new class extends Migration {
             $table->string('value_text')->nullable();
             $table->text('details')->nullable();
             $table->date('date_rapport');
-            $table->foreignId('valide_par')->nullable()->constrained('users')->nullOnDelete();
+            $table->string('valide_par')->nullable();
+            $table->foreign('valide_par')->references('id')->on('users')->nullOnDelete();
             $table->text('motif_rejet')->nullable();
             $table->timestamps();
         });

@@ -103,7 +103,6 @@ Route::middleware(['auth:sanctum', 'role:client'])->group(function () {
 
 // Tous les utilisateurs authentifiés
 Route::middleware('auth:sanctum')->group(function () {
-    // Posts
     Route::get('posts', [PostController::class, 'index']);
     Route::get('posts/{post}', [PostController::class, 'show']);
     Route::post('posts', [PostController::class, 'store']);
@@ -111,13 +110,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('posts/{post}/save', [PostController::class, 'toggleSave']);
     Route::post('posts/{post}/comments', [PostController::class, 'addComment']);
 
-    // Messagerie
     Route::get('conversations', [MessagingController::class, 'index']);
     Route::post('conversations', [MessagingController::class, 'startConversation']);
     Route::get('conversations/{conversation}', [MessagingController::class, 'show']);
     Route::post('conversations/{conversation}/messages', [MessagingController::class, 'sendMessage']);
     Route::post('conversations/{conversation}/read', [MessagingController::class, 'markAsRead']);
 
-    // Documents
     Route::post('documents/{type}/{id}', [DocumentController::class, 'attach']);
 });

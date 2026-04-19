@@ -14,7 +14,7 @@ class ApproveCreditRequest extends FormRequest
             'montant_approuve'   => ['required', 'numeric', 'min:0.01'],
             'montant_echeance'   => ['nullable', 'numeric', 'min:0'],
             'prochaine_echeance' => ['nullable', 'date'],
-            'traite_par'         => ['required', 'integer', 'exists:users,id'],
+            'traite_par'         => ['required', 'string', 'exists:users,id'],
         ];
     }
 }

@@ -8,8 +8,11 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('credits', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('client_id')->constrained('clients')->cascadeOnDelete();
+            $table->string('id')->primary();
+
+            $table->string('client_id');
+            $table->foreign('client_id')->references('id')->on('clients')->cascadeOnDelete();
+
             $table->foreignId('credit_type_id')->constrained('credit_types');
             $table->foreignId('credit_status_id')->constrained('credit_statuses');
 
@@ -31,7 +34,9 @@ return new class extends Migration {
             $table->boolean('autres_credits')->default(false);
             $table->decimal('montant_autres_credits', 12, 2)->nullable();
 
-            $table->foreignId('traite_par')->nullable()->constrained('users')->nullOnDelete();
+            $table->string('traite_par')->nullable();
+            $table->foreign('traite_par')->references('id')->on('users')->nullOnDelete();
+
             $table->timestamps();
         });
     }

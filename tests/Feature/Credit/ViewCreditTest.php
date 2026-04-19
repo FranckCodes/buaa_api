@@ -17,7 +17,7 @@ class ViewCreditTest extends TestCase
         $this->seed();
 
         $user   = $this->createUserWithRole('client');
-        $client = Client::factory()->create(['user_id' => $user->id]);
+        $client = Client::factory()->create(['id' => $user->id]);
         $credit = Credit::factory()->create(['client_id' => $client->id]);
 
         $this->actingAs($user, 'sanctum')
@@ -31,14 +31,28 @@ class ViewCreditTest extends TestCase
         $this->seed();
 
         $userA   = $this->createUserWithRole('client');
-        $clientA = Client::factory()->create(['user_id' => $userA->id]);
+        $clientA = Client::factory()->create(['id' => $userA->id]);
 
         $userB   = $this->createUserWithRole('client');
-        $clientB = Client::factory()->create(['user_id' => $userB->id]);
+        $clientB = Client::factory()->create(['id' => $userB->id]);
         $credit  = Credit::factory()->create(['client_id' => $clientB->id]);
 
         $this->actingAs($userA, 'sanctum')
             ->getJson("/api/credits/{$credit->id}")
             ->assertForbidden();
+    }
+
+    public function test_admin_can_view_any_credit(): void
+    {
+        $this->seed();
+
+        $admin      = $this->createUserWithRole('admin');
+        $clientUser = $this->createUserWithRole('client');
+        $client     = Client::factory()->create(['id' => $clientUser->id]);
+        $credit     = Credit::factory()->create(['client_id' => $client->id]);
+
+        $this->actingAs($admin, 'sanctum')
+            ->getJson("/api/credits/{$credit->id}")
+            ->assertOk();
     }
 }

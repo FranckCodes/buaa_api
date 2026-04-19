@@ -9,7 +9,8 @@ return new class extends Migration {
     {
         Schema::create('insurances', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('client_id')->constrained('clients')->cascadeOnDelete();
+            $table->string('client_id');
+            $table->foreign('client_id')->references('id')->on('clients')->cascadeOnDelete();
             $table->foreignId('insurance_type_id')->constrained('insurance_types');
             $table->foreignId('insurance_status_id')->constrained('insurance_statuses');
 
@@ -31,7 +32,8 @@ return new class extends Migration {
             $table->text('antecedents_medicaux')->nullable();
             $table->string('medecin_traitant')->nullable();
 
-            $table->foreignId('traite_par')->nullable()->constrained('users')->nullOnDelete();
+            $table->string('traite_par')->nullable();
+            $table->foreign('traite_par')->references('id')->on('users')->nullOnDelete();
             $table->timestamps();
         });
     }

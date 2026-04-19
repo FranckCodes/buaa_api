@@ -18,7 +18,7 @@ class ClientPolicy
     {
         if ($user->isAdminLike()) return true;
         if ($user->isSupervisor() && $client->superviseur_id === $user->id) return true;
-        return $user->id === $client->user_id;
+        return $user->id === $client->id;
     }
 
     public function create(User $user): bool { return $user->isAdminLike(); }
@@ -26,7 +26,7 @@ class ClientPolicy
     public function update(User $user, Client $client): bool
     {
         if ($user->isAdminLike()) return true;
-        return $user->id === $client->user_id;
+        return $user->id === $client->id;
     }
 
     public function assignSupervisor(User $user): bool { return $user->isAdminLike(); }

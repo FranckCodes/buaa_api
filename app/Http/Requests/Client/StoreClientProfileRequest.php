@@ -34,7 +34,7 @@ class StoreClientProfileRequest extends FormRequest
             'ref_nom'                  => ['nullable', 'string', 'max:100'],
             'ref_telephone'            => ['nullable', 'string', 'max:30'],
             'ref_relation'             => ['nullable', 'string', 'max:100'],
-            'superviseur_id'           => ['nullable', 'integer', 'exists:users,id'],
+            'superviseur_id'           => ['nullable', 'string', 'exists:users,id'],
         ];
     }
 }

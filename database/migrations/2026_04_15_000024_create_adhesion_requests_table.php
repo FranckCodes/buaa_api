@@ -27,7 +27,8 @@ return new class extends Migration {
             $table->integer('experience_annees')->nullable();
             $table->integer('nombre_animaux')->nullable();
             $table->string('type_elevage')->nullable();
-            $table->foreignId('traite_par')->nullable()->constrained('users')->nullOnDelete();
+            $table->string('traite_par')->nullable();
+            $table->foreign('traite_par')->references('id')->on('users')->nullOnDelete();
             $table->timestamps();
         });
     }

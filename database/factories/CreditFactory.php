@@ -15,8 +15,9 @@ class CreditFactory extends Factory
     public function definition(): array
     {
         return [
+            'id'                     => 'CRD-' . now()->format('Ymd') . '-' . strtoupper(substr(bin2hex(random_bytes(3)), 0, 4)),
             'client_id'              => Client::factory(),
-            'credit_type_id'         => CreditType::first()?->id,
+            'credit_type_id'         => CreditType::query()->first()?->id,
             'credit_status_id'       => CreditStatus::where('code', 'en_analyse')->first()?->id,
             'montant_demande'        => fake()->randomFloat(2, 100, 5000),
             'montant_approuve'       => null,

@@ -16,14 +16,14 @@ class StoreCreditTest extends TestCase
     {
         $this->seed();
 
-        $user   = $this->createUserWithRole('client');
-        $client = Client::factory()->create(['user_id' => $user->id]);
-        $type   = CreditType::firstOrFail();
+        $clientUser = $this->createUserWithRole('client');
+        $client     = Client::factory()->create(['id' => $clientUser->id]);
+        $creditType = CreditType::firstOrFail();
 
-        $this->actingAs($user, 'sanctum')
+        $this->actingAs($clientUser, 'sanctum')
             ->postJson('/api/credits', [
                 'client_id'       => $client->id,
-                'credit_type_id'  => $type->id,
+                'credit_type_id'  => $creditType->id,
                 'montant_demande' => 500,
                 'duree_mois'      => 6,
                 'objet_credit'    => 'Achat matériel',
@@ -46,7 +46,7 @@ class StoreCreditTest extends TestCase
         $this->actingAs($user, 'sanctum')
             ->postJson('/api/credits', [])
             ->assertStatus(422)
-            ->assertJsonStructure(['success', 'message', 'data', 'meta', 'errors'])
-            ->assertJsonPath('success', false);
+            ->assertJsonPath('success', false)
+            ->assertJsonStructure(['success', 'message', 'data', 'meta', 'errors']);
     }
 }

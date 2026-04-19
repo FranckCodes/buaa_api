@@ -21,8 +21,7 @@ use App\Policies\InsurancePolicy;
 use App\Policies\OrderPolicy;
 use App\Policies\PostPolicy;
 use App\Policies\ReportPolicy;
-use App\Policies\SupportTicketPolicy;
-use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use App\Policies\SupportTicketPolicy;use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
 {

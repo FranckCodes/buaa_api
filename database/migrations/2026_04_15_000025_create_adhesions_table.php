@@ -9,7 +9,8 @@ return new class extends Migration {
     {
         Schema::create('adhesions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('client_id')->constrained('clients')->cascadeOnDelete();
+            $table->string('client_id');
+            $table->foreign('client_id')->references('id')->on('clients')->cascadeOnDelete();
             $table->foreignId('union_id')->constrained('unions')->cascadeOnDelete();
             $table->foreignId('adhesion_type_id')->constrained('adhesion_types');
             $table->foreignId('adhesion_status_id')->constrained('adhesion_statuses');

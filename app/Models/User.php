@@ -17,9 +17,12 @@ class User extends Authenticatable
     use HasApiTokens, Notifiable;
 
     protected $fillable = [
-        'nom_complet', 'email', 'telephone', 'password',
+        'id', 'nom_complet', 'email', 'telephone', 'password',
         'user_status_id', 'photo_profil', 'derniere_connexion',
     ];
+
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     protected $hidden = ['password', 'remember_token'];
 
@@ -41,7 +44,7 @@ class User extends Authenticatable
 
     public function clientProfile(): HasOne
     {
-        return $this->hasOne(Client::class, 'user_id');
+        return $this->hasOne(Client::class, 'id');
     }
 
     public function supervisedClients(): HasMany

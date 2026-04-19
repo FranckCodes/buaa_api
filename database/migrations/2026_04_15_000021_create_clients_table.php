@@ -8,8 +8,8 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('clients', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->unique()->constrained('users')->cascadeOnDelete();
+            $table->string('id')->primary();
+            $table->foreign('id')->references('id')->on('users')->cascadeOnDelete();
 
             $table->date('date_naissance')->nullable();
             $table->string('lieu_naissance')->nullable();
@@ -39,7 +39,8 @@ return new class extends Migration {
             $table->string('ref_telephone')->nullable();
             $table->string('ref_relation')->nullable();
 
-            $table->foreignId('superviseur_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->string('superviseur_id')->nullable();
+            $table->foreign('superviseur_id')->references('id')->on('users')->nullOnDelete();
 
             $table->timestamps();
         });

@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 class Client extends Model
 {
     protected $fillable = [
-        'user_id', 'date_naissance', 'lieu_naissance', 'sexe', 'etat_civil',
+        'id', 'date_naissance', 'lieu_naissance', 'sexe', 'etat_civil',
         'adresse_complete', 'ville', 'province', 'territoire',
         'client_activity_type_id', 'client_structure_type_id',
         'profession_detaillee', 'experience_annees', 'superficie_exploitation',
@@ -20,6 +20,9 @@ class Client extends Model
         'banque_principale', 'numero_compte', 'ref_nom', 'ref_telephone', 'ref_relation',
         'superviseur_id',
     ];
+
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     protected $casts = [
         'date_naissance' => 'date',
@@ -29,7 +32,7 @@ class Client extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'id');
     }
 
     public function activityType(): BelongsTo

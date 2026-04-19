@@ -10,12 +10,28 @@ use Illuminate\Support\Facades\Hash;
 
 class UserService
 {
+    public function __construct(protected IdGeneratorService $idGenerator) {}
+
+    protected function resolveUserIdByRole(array $roleCodes): string
+    {
+        $prefix = match (true) {
+            in_array('super_admin', $roleCodes) => 'ADM',
+            in_array('admin', $roleCodes)       => 'ADM',
+            in_array('superviseur', $roleCodes) => 'SUP',
+            in_array('client', $roleCodes)      => 'CLT',
+            default                             => 'USR',
+        };
+
+        return $prefix . '-' . str_pad((string) random_int(1, 99999), 5, '0', STR_PAD_LEFT);
+    }
+
     public function createUser(array $data, array $roleCodes = []): User
     {
         return DB::transaction(function () use ($data, $roleCodes) {
             $status = UserStatus::where('code', $data['status_code'] ?? 'actif')->firstOrFail();
 
             $user = User::create([
+                'id'             => $data['id'] ?? $this->resolveUserIdByRole($roleCodes),
                 'nom_complet'    => $data['nom_complet'],
                 'email'          => $data['email'],
                 'telephone'      => $data['telephone'] ?? null,

@@ -14,6 +14,7 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
+            'id'                  => 'USR-' . str_pad((string) fake()->unique()->numberBetween(1, 99999), 5, '0', STR_PAD_LEFT),
             'nom_complet'         => fake()->name(),
             'email'               => fake()->unique()->safeEmail(),
             'telephone'           => fake()->phoneNumber(),

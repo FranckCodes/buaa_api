@@ -15,7 +15,7 @@ class ClientFactory extends Factory
     public function definition(): array
     {
         return [
-            'user_id'                  => User::factory(),
+            'id'                       => User::factory(),
             'date_naissance'           => fake()->date(),
             'lieu_naissance'           => fake()->city(),
             'sexe'                     => fake()->randomElement(['M', 'F']),

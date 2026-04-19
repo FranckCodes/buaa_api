@@ -18,7 +18,7 @@ class CreditPolicy
     {
         if ($user->isAdminLike()) return true;
         if ($user->isSupervisor() && $credit->client?->superviseur_id === $user->id) return true;
-        return $user->id === $credit->client?->user_id;
+        return $user->id === $credit->client_id;
     }
 
     public function create(User $user): bool { return $user->isClient() || $user->isAdminLike(); }

@@ -10,7 +10,8 @@ return new class extends Migration {
         Schema::create('conversation_participants', function (Blueprint $table) {
             $table->id();
             $table->foreignId('conversation_id')->constrained('conversations')->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->string('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
             $table->unsignedInteger('unread_count')->default(0);
             $table->timestamp('last_read_at')->nullable();
             $table->timestamps();

@@ -28,7 +28,7 @@ class ClientController extends Controller
         $this->authorize('view', $client);
 
         return $this->successResponse(
-            new ClientResource($client->load(['user', 'activityType', 'structureType', 'superviseur', 'adhesions', 'credits', 'insurances', 'orders', 'reports', 'supportTickets'])),
+            new ClientResource($client->load(['user.roles', 'user.status', 'activityType', 'structureType', 'superviseur', 'adhesions', 'credits', 'insurances', 'orders', 'reports', 'supportTickets'])),
             'Détail du client récupéré avec succès.'
         );
     }

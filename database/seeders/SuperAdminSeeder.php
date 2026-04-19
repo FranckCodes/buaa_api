@@ -17,6 +17,7 @@ class SuperAdminSeeder extends Seeder
         $user = User::updateOrCreate(
             ['email' => 'superadmin@buaa.cd'],
             [
+                'id'             => 'ADM-001',
                 'nom_complet'    => 'Super Administrateur',
                 'telephone'      => '+243000000000',
                 'password'       => Hash::make('password'),

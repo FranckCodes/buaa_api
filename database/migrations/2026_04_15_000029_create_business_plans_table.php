@@ -8,9 +8,14 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('business_plans', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('credit_id')->unique()->constrained('credits')->cascadeOnDelete();
-            $table->foreignId('client_id')->constrained('clients')->cascadeOnDelete();
+            $table->string('id')->primary();
+
+            $table->string('credit_id')->unique();
+            $table->foreign('credit_id')->references('id')->on('credits')->cascadeOnDelete();
+
+            $table->string('client_id');
+            $table->foreign('client_id')->references('id')->on('clients')->cascadeOnDelete();
+
             $table->string('titre');
             $table->text('resume')->nullable();
             $table->longText('description')->nullable();
@@ -18,7 +23,9 @@ return new class extends Migration {
             $table->string('statut')->default('en_analyse');
             $table->unsignedTinyInteger('score')->nullable();
             $table->date('date_soumission');
-            $table->foreignId('evalue_par')->nullable()->constrained('users')->nullOnDelete();
+            $table->string('evalue_par')->nullable();
+            $table->foreign('evalue_par')->references('id')->on('users')->nullOnDelete();
+
             $table->timestamps();
         });
     }

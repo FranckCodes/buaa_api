@@ -18,7 +18,7 @@ class ApproveCreditTest extends TestCase
 
         $admin      = $this->createUserWithRole('admin');
         $clientUser = $this->createUserWithRole('client');
-        $client     = Client::factory()->create(['user_id' => $clientUser->id]);
+        $client     = Client::factory()->create(['id' => $clientUser->id]);
         $credit     = Credit::factory()->create(['client_id' => $client->id]);
 
         $this->actingAs($admin, 'sanctum')
@@ -39,7 +39,7 @@ class ApproveCreditTest extends TestCase
         $this->seed();
 
         $clientUser = $this->createUserWithRole('client');
-        $client     = Client::factory()->create(['user_id' => $clientUser->id]);
+        $client     = Client::factory()->create(['id' => $clientUser->id]);
         $credit     = Credit::factory()->create(['client_id' => $client->id]);
 
         $this->actingAs($clientUser, 'sanctum')
@@ -48,5 +48,31 @@ class ApproveCreditTest extends TestCase
                 'traite_par'       => $clientUser->id,
             ])
             ->assertForbidden();
+    }
+
+    public function test_cannot_approve_already_approved_credit(): void
+    {
+        $this->seed();
+
+        $admin      = $this->createUserWithRole('admin');
+        $clientUser = $this->createUserWithRole('client');
+        $client     = Client::factory()->create(['id' => $clientUser->id]);
+        $credit     = Credit::factory()->create(['client_id' => $client->id]);
+
+        // Première approbation
+        $this->actingAs($admin, 'sanctum')
+            ->postJson("/api/credits/{$credit->id}/approve", [
+                'montant_approuve' => 400,
+                'traite_par'       => $admin->id,
+            ]);
+
+        // Deuxième approbation — doit échouer
+        $this->actingAs($admin, 'sanctum')
+            ->postJson("/api/credits/{$credit->id}/approve", [
+                'montant_approuve' => 400,
+                'traite_par'       => $admin->id,
+            ])
+            ->assertStatus(422)
+            ->assertJsonPath('success', false);
     }
 }

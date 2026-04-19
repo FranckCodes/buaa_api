@@ -7,8 +7,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class BusinessPlan extends Model
 {
+    public $incrementing = false;
+    protected $keyType = 'string';
+
     protected $fillable = [
-        'credit_id', 'client_id', 'titre', 'resume', 'description',
+        'id', 'credit_id', 'client_id', 'titre', 'resume', 'description',
         'retour_investissement', 'statut', 'score', 'date_soumission', 'evalue_par',
     ];
 

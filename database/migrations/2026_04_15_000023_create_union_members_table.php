@@ -10,7 +10,8 @@ return new class extends Migration {
         Schema::create('union_members', function (Blueprint $table) {
             $table->id();
             $table->foreignId('union_id')->constrained('unions')->cascadeOnDelete();
-            $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
+            $table->string('user_id')->nullable();
+            $table->foreign('user_id')->references('id')->on('users')->nullOnDelete();
             $table->string('nom_complet')->nullable();
             $table->string('telephone')->nullable();
             $table->string('role_dans_union');

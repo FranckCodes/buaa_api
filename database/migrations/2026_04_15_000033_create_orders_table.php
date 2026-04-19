@@ -9,7 +9,8 @@ return new class extends Migration {
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('client_id')->constrained('clients')->cascadeOnDelete();
+            $table->string('client_id');
+            $table->foreign('client_id')->references('id')->on('clients')->cascadeOnDelete();
             $table->foreignId('order_type_id')->constrained('order_types');
             $table->foreignId('order_status_id')->constrained('order_statuses');
             $table->decimal('montant', 12, 2)->nullable();
@@ -20,7 +21,8 @@ return new class extends Migration {
             $table->string('priorite')->default('moyenne');
             $table->unsignedTinyInteger('progression')->default(0);
             $table->date('date_soumission');
-            $table->foreignId('traite_par')->nullable()->constrained('users')->nullOnDelete();
+            $table->string('traite_par')->nullable();
+            $table->foreign('traite_par')->references('id')->on('users')->nullOnDelete();
             $table->timestamps();
         });
     }

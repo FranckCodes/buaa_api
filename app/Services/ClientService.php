@@ -12,7 +12,7 @@ class ClientService
     {
         return DB::transaction(function () use ($user, $data) {
             return Client::updateOrCreate(
-                ['user_id' => $user->id],
+                ['id' => $user->id],
                 [
                     'date_naissance'           => $data['date_naissance'] ?? null,
                     'lieu_naissance'           => $data['lieu_naissance'] ?? null,

@@ -11,7 +11,7 @@ class StoreCreditRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'client_id'              => ['required', 'integer', 'exists:clients,id'],
+            'client_id'              => ['required', 'string', 'exists:clients,id'],
             'credit_type_id'         => ['required', 'integer', 'exists:credit_types,id'],
             'montant_demande'        => ['required', 'numeric', 'min:0.01'],
             'date_demande'           => ['nullable', 'date'],

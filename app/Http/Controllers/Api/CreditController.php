@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Credit\ApproveCreditRequest;
 use App\Http\Requests\Credit\RegisterCreditPaymentRequest;
 use App\Http\Requests\Credit\StoreCreditRequest;
+use App\Http\Resources\CreditPaymentResource;
 use App\Http\Resources\CreditResource;
 use App\Models\Credit;
 use App\Models\CreditPayment;
@@ -20,7 +21,7 @@ class CreditController extends Controller
         $this->authorize('viewAny', Credit::class);
 
         return $this->paginatedResponse(
-            Credit::with(['client.user', 'type', 'status'])->latest()->paginate(15),
+            Credit::with(['client.user', 'type', 'status', 'treatedBy'])->latest()->paginate(15),
             'Liste des crédits récupérée avec succès.',
             fn ($credit) => new CreditResource($credit)
         );
@@ -29,6 +30,7 @@ class CreditController extends Controller
     public function store(StoreCreditRequest $request, CreditService $creditService): JsonResponse
     {
         $this->authorize('create', Credit::class);
+
         $credit = $creditService->createCreditRequest($request->validated());
 
         return $this->successResponse(
@@ -43,7 +45,7 @@ class CreditController extends Controller
         $this->authorize('view', $credit);
 
         return $this->successResponse(
-            new CreditResource($credit->load(['client.user', 'type', 'status', 'treatedBy', 'payments', 'businessPlan', 'documents'])),
+            new CreditResource($credit->load(['client.user', 'type', 'status', 'treatedBy', 'payments', 'businessPlan'])),
             'Détail du crédit récupéré avec succès.'
         );
     }
@@ -61,11 +63,11 @@ class CreditController extends Controller
     public function reject(Request $request, Credit $credit, CreditService $creditService): JsonResponse
     {
         $this->authorize('reject', $credit);
-        $request->validate(['processed_by' => ['required', 'integer', 'exists:users,id']]);
+        $request->validate(['processed_by' => ['required', 'string', 'exists:users,id']]);
 
         return $this->successResponse(
-            new CreditResource($creditService->rejectCredit($credit, $request->integer('processed_by'))),
-            'Crédit rejeté.'
+            new CreditResource($creditService->rejectCredit($credit, $request->string('processed_by')->toString())),
+            'Crédit rejeté avec succès.'
         );
     }
 
@@ -74,7 +76,7 @@ class CreditController extends Controller
         $this->authorize('registerPayment', $payment->credit);
 
         return $this->successResponse(
-            $creditService->registerPayment($payment, $request->validated()),
+            new CreditPaymentResource($creditService->registerPayment($payment, $request->validated())),
             'Paiement enregistré avec succès.'
         );
     }
