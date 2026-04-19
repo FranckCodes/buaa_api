@@ -22,9 +22,9 @@ class InsuranceController extends Controller
         $this->authorize('viewAny', Insurance::class);
 
         return $this->paginatedResponse(
-            Insurance::with(['client.user', 'type', 'status'])->latest()->paginate(15),
+            Insurance::with(['client.user', 'type', 'status', 'treatedBy'])->latest()->paginate(15),
             'Liste des assurances récupérée avec succès.',
-            fn ($item) => new InsuranceResource($item)
+            fn ($insurance) => new InsuranceResource($insurance)
         );
     }
 
@@ -32,8 +32,10 @@ class InsuranceController extends Controller
     {
         $this->authorize('create', Insurance::class);
 
+        $insurance = $insuranceService->createSubscription($request->validated());
+
         return $this->successResponse(
-            new InsuranceResource($insuranceService->createSubscription($request->validated())->load(['client.user', 'type', 'status'])),
+            new InsuranceResource($insurance->load(['client.user', 'type', 'status', 'beneficiaries'])),
             'Souscription enregistrée avec succès.',
             201
         );
@@ -54,7 +56,7 @@ class InsuranceController extends Controller
         $this->authorize('activate', $insurance);
 
         return $this->successResponse(
-            new InsuranceResource($insuranceService->activateInsurance($insurance, $request->integer('processed_by'))),
+            new InsuranceResource($insuranceService->activateInsurance($insurance, $request->string('processed_by')->toString())),
             'Assurance activée avec succès.'
         );
     }
@@ -64,14 +66,16 @@ class InsuranceController extends Controller
         return $this->paginatedResponse(
             InsuranceClaim::with(['insurance', 'client.user', 'treatedBy'])->latest()->paginate(15),
             'Liste des réclamations récupérée avec succès.',
-            fn ($item) => new InsuranceClaimResource($item)
+            fn ($claim) => new InsuranceClaimResource($claim)
         );
     }
 
     public function storeClaim(StoreInsuranceClaimRequest $request, InsuranceService $insuranceService): JsonResponse
     {
+        $claim = $insuranceService->createClaim($request->validated());
+
         return $this->successResponse(
-            new InsuranceClaimResource($insuranceService->createClaim($request->validated())),
+            new InsuranceClaimResource($claim->load(['insurance', 'client.user'])),
             'Réclamation créée avec succès.',
             201
         );
@@ -79,19 +83,22 @@ class InsuranceController extends Controller
 
     public function approveClaim(ApproveInsuranceClaimRequest $request, InsuranceClaim $claim, InsuranceService $insuranceService): JsonResponse
     {
+        $this->authorize('manageClaims', $claim->insurance);
+
         return $this->successResponse(
-            new InsuranceClaimResource($insuranceService->approveClaim($claim, (float) $request->input('amount'), $request->integer('processed_by'))),
+            new InsuranceClaimResource($insuranceService->approveClaim($claim, (float) $request->input('amount'), $request->string('processed_by')->toString())),
             'Réclamation approuvée avec succès.'
         );
     }
 
     public function rejectClaim(Request $request, InsuranceClaim $claim, InsuranceService $insuranceService): JsonResponse
     {
-        $request->validate(['processed_by' => ['required', 'integer', 'exists:users,id']]);
+        $this->authorize('manageClaims', $claim->insurance);
+        $request->validate(['processed_by' => ['required', 'string', 'exists:users,id']]);
 
         return $this->successResponse(
-            new InsuranceClaimResource($insuranceService->rejectClaim($claim, $request->integer('processed_by'))),
-            'Réclamation rejetée.'
+            new InsuranceClaimResource($insuranceService->rejectClaim($claim, $request->string('processed_by')->toString())),
+            'Réclamation rejetée avec succès.'
         );
     }
 }

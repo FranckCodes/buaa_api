@@ -22,6 +22,8 @@ class DatabaseSeeder extends Seeder
             SupportCategorySeeder::class,
             PostTagSeeder::class,
             PostStatusSeeder::class,
+            InsuranceTypeSeeder::class,
+            InsuranceStatusSeeder::class,
             SuperAdminSeeder::class,
         ]);
     }

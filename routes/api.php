@@ -7,9 +7,8 @@ use App\Http\Controllers\Api\CreditController;
 use App\Http\Controllers\Api\DocumentController;
 use App\Http\Controllers\Api\InsuranceController;
 use App\Http\Controllers\Api\MessagingController;
-use App\Http\Controllers\Api\OrderController;
-use App\Http\Controllers\Api\MessagingController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\ReferenceController;
 use App\Http\Controllers\Api\ReportController;
@@ -130,6 +129,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('documents/{type}/{id}', [DocumentController::class, 'attach']);
     Route::get('documents/{document}', [DocumentController::class, 'show']);
     Route::delete('documents/{document}', [DocumentController::class, 'destroy']);
+
+    // Assurances
+    Route::get('insurances', [InsuranceController::class, 'index']);
+    Route::post('insurances', [InsuranceController::class, 'store']);
+    Route::get('insurances/{insurance}', [InsuranceController::class, 'show']);
+    Route::post('insurances/{insurance}/activate', [InsuranceController::class, 'activate']);
+    Route::get('insurance-claims', [InsuranceController::class, 'claimsIndex']);
+    Route::post('insurance-claims', [InsuranceController::class, 'storeClaim']);
+    Route::post('insurance-claims/{claim}/approve', [InsuranceController::class, 'approveClaim']);
+    Route::post('insurance-claims/{claim}/reject', [InsuranceController::class, 'rejectClaim']);
 
     // Conversations
     Route::get('conversations', [MessagingController::class, 'index']);

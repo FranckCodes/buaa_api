@@ -18,7 +18,7 @@ class InsurancePolicy
     {
         if ($user->isAdminLike()) return true;
         if ($user->isSupervisor() && $insurance->client?->superviseur_id === $user->id) return true;
-        return $user->id === $insurance->client?->user_id;
+        return $user->id === $insurance->client_id;
     }
 
     public function create(User $user): bool { return $user->isClient() || $user->isAdminLike(); }

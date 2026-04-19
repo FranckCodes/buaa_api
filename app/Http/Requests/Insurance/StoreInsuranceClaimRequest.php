@@ -11,8 +11,8 @@ class StoreInsuranceClaimRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'insurance_id'    => ['required', 'integer', 'exists:insurances,id'],
-            'client_id'       => ['required', 'integer', 'exists:clients,id'],
+            'insurance_id'    => ['required', 'string', 'exists:insurances,id'],
+            'client_id'       => ['required', 'string', 'exists:clients,id'],
             'type_sinistre'   => ['required', 'string', 'max:255'],
             'montant_reclame' => ['required', 'numeric', 'min:0.01'],
             'description'     => ['nullable', 'string'],

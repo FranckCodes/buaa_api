@@ -11,8 +11,11 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Insurance extends Model
 {
+    public $incrementing = false;
+    protected $keyType = 'string';
+
     protected $fillable = [
-        'client_id', 'insurance_type_id', 'insurance_status_id',
+        'id', 'client_id', 'insurance_type_id', 'insurance_status_id',
         'montant_annuel', 'date_souscription', 'date_debut', 'date_fin',
         'prochaine_echeance', 'description', 'couvertures', 'etablissement',
         'niveau_etude', 'superficie_hectares', 'type_culture', 'valeur_materiel',
@@ -20,10 +23,14 @@ class Insurance extends Model
     ];
 
     protected $casts = [
-        'montant_annuel' => 'decimal:2', 'date_souscription' => 'date',
-        'date_debut' => 'date', 'date_fin' => 'date', 'prochaine_echeance' => 'date',
-        'couvertures' => 'array', 'superficie_hectares' => 'decimal:2',
-        'valeur_materiel' => 'decimal:2',
+        'montant_annuel'      => 'decimal:2',
+        'date_souscription'   => 'date',
+        'date_debut'          => 'date',
+        'date_fin'            => 'date',
+        'prochaine_echeance'  => 'date',
+        'couvertures'         => 'array',
+        'superficie_hectares' => 'decimal:2',
+        'valeur_materiel'     => 'decimal:2',
     ];
 
     public function client(): BelongsTo { return $this->belongsTo(Client::class); }

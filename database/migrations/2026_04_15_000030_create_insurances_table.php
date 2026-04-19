@@ -8,9 +8,11 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('insurances', function (Blueprint $table) {
-            $table->id();
+            $table->string('id')->primary();
+
             $table->string('client_id');
             $table->foreign('client_id')->references('id')->on('clients')->cascadeOnDelete();
+
             $table->foreignId('insurance_type_id')->constrained('insurance_types');
             $table->foreignId('insurance_status_id')->constrained('insurance_statuses');
 
@@ -19,6 +21,7 @@ return new class extends Migration {
             $table->date('date_debut')->nullable();
             $table->date('date_fin')->nullable();
             $table->date('prochaine_echeance')->nullable();
+
             $table->text('description')->nullable();
             $table->json('couvertures')->nullable();
 
@@ -34,6 +37,7 @@ return new class extends Migration {
 
             $table->string('traite_par')->nullable();
             $table->foreign('traite_par')->references('id')->on('users')->nullOnDelete();
+
             $table->timestamps();
         });
     }

@@ -12,7 +12,7 @@ class ApproveInsuranceClaimRequest extends FormRequest
     {
         return [
             'amount'       => ['required', 'numeric', 'min:0.01'],
-            'processed_by' => ['required', 'integer', 'exists:users,id'],
+            'processed_by' => ['required', 'string', 'exists:users,id'],
         ];
     }
 }
