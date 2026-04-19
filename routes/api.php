@@ -130,6 +130,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('documents/{document}', [DocumentController::class, 'show']);
     Route::delete('documents/{document}', [DocumentController::class, 'destroy']);
 
+    // Adhésions
+    Route::get('unions', [AdhesionController::class, 'unionsIndex']);
+    Route::post('unions', [AdhesionController::class, 'storeUnion']);
+    Route::get('adhesion-requests', [AdhesionController::class, 'requestsIndex']);
+    Route::post('adhesion-requests', [AdhesionController::class, 'storeRequest']);
+    Route::post('adhesion-requests/{adhesionRequest}/approve', [AdhesionController::class, 'approveRequest']);
+    Route::post('adhesion-requests/{adhesionRequest}/reject', [AdhesionController::class, 'rejectRequest']);
+    Route::get('adhesions', [AdhesionController::class, 'index']);
+    Route::get('adhesions/{adhesion}', [AdhesionController::class, 'show']);
+
     // Assurances
     Route::get('insurances', [InsuranceController::class, 'index']);
     Route::post('insurances', [InsuranceController::class, 'store']);

@@ -18,7 +18,7 @@ class AdhesionPolicy
     {
         if ($user->isAdminLike()) return true;
         if ($user->isSupervisor() && $adhesion->client?->superviseur_id === $user->id) return true;
-        return $user->id === $adhesion->client?->user_id;
+        return $user->id === $adhesion->client_id;
     }
 
     public function createRequest(User $user): bool { return $user->isClient() || $user->isAdminLike(); }

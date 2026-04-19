@@ -13,7 +13,10 @@ class Cotisation extends Model
         'date_paiement', 'payment_mode_id', 'reference_recu',
     ];
 
-    protected $casts = ['montant' => 'decimal:2', 'date_paiement' => 'date'];
+    protected $casts = [
+        'montant'       => 'decimal:2',
+        'date_paiement' => 'date',
+    ];
 
     public function adhesion(): BelongsTo { return $this->belongsTo(Adhesion::class); }
     public function paymentMode(): BelongsTo { return $this->belongsTo(PaymentMode::class, 'payment_mode_id'); }

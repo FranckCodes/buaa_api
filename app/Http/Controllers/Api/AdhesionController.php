@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Adhesion\ApproveAdhesionRequestRequest;
 use App\Http\Requests\Adhesion\StoreAdhesionRequestRequest;
+use App\Http\Requests\Adhesion\StoreUnionRequest;
 use App\Http\Resources\AdhesionRequestResource;
 use App\Http\Resources\AdhesionResource;
+use App\Http\Resources\UnionResource;
 use App\Models\Adhesion;
 use App\Models\AdhesionRequest;
 use App\Models\Client;
@@ -17,6 +19,22 @@ use Illuminate\Http\Request;
 
 class AdhesionController extends Controller
 {
+    public function unionsIndex(): JsonResponse
+    {
+        return $this->paginatedResponse(
+            Union::latest()->paginate(15),
+            'Liste des unions récupérée avec succès.',
+            fn ($union) => new UnionResource($union)
+        );
+    }
+
+    public function storeUnion(StoreUnionRequest $request, AdhesionService $adhesionService): JsonResponse
+    {
+        $union = $adhesionService->createUnion($request->validated());
+
+        return $this->successResponse(new UnionResource($union), 'Union créée avec succès.', 201);
+    }
+
     public function requestsIndex(): JsonResponse
     {
         return $this->paginatedResponse(
@@ -30,18 +48,16 @@ class AdhesionController extends Controller
     {
         $this->authorize('createRequest', Adhesion::class);
 
-        return $this->successResponse(
-            new AdhesionRequestResource($adhesionService->createRequest($request->validated())),
-            "Demande d'adhésion créée avec succès.",
-            201
-        );
+        $item = $adhesionService->createRequest($request->validated());
+
+        return $this->successResponse(new AdhesionRequestResource($item), "Demande d'adhésion créée avec succès.", 201);
     }
 
     public function approveRequest(ApproveAdhesionRequestRequest $request, AdhesionRequest $adhesionRequest, AdhesionService $adhesionService): JsonResponse
     {
         $this->authorize('approve', Adhesion::class);
-        $data = $request->validated();
 
+        $data     = $request->validated();
         $adhesion = $adhesionService->approveRequest(
             $adhesionRequest,
             Client::findOrFail($data['client_id']),
@@ -56,12 +72,12 @@ class AdhesionController extends Controller
 
     public function rejectRequest(Request $request, AdhesionRequest $adhesionRequest, AdhesionService $adhesionService): JsonResponse
     {
-        $request->validate(['processed_by' => ['required', 'integer', 'exists:users,id']]);
+        $this->authorize('approve', Adhesion::class);
+        $request->validate(['processed_by' => ['required', 'string', 'exists:users,id']]);
 
-        return $this->successResponse(
-            new AdhesionRequestResource($adhesionService->rejectRequest($adhesionRequest, $request->integer('processed_by'))),
-            "Demande d'adhésion rejetée."
-        );
+        $item = $adhesionService->rejectRequest($adhesionRequest, $request->string('processed_by')->toString());
+
+        return $this->successResponse(new AdhesionRequestResource($item), "Demande d'adhésion rejetée avec succès.");
     }
 
     public function index(): JsonResponse
@@ -71,7 +87,7 @@ class AdhesionController extends Controller
         return $this->paginatedResponse(
             Adhesion::with(['client.user', 'union', 'type', 'status', 'paymentMode'])->latest()->paginate(15),
             'Liste des adhésions récupérée avec succès.',
-            fn ($item) => new AdhesionResource($item)
+            fn ($adhesion) => new AdhesionResource($adhesion)
         );
     }
 
@@ -80,7 +96,7 @@ class AdhesionController extends Controller
         $this->authorize('view', $adhesion);
 
         return $this->successResponse(
-            new AdhesionResource($adhesion->load(['client.user', 'union', 'type', 'status', 'paymentMode', 'cotisations', 'documents'])),
+            new AdhesionResource($adhesion->load(['client.user', 'union', 'type', 'status', 'paymentMode', 'cotisations.paymentMode', 'documents'])),
             "Détail de l'adhésion récupéré avec succès."
         );
     }

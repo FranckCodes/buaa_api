@@ -26,6 +26,16 @@ class IdGeneratorService
         return 'USR-' . str_pad((string) random_int(1, 99999), 5, '0', STR_PAD_LEFT);
     }
 
+    public function generateAdhesionId(): string
+    {
+        return 'ADH-' . now()->format('Ymd') . '-' . strtoupper(substr(bin2hex(random_bytes(3)), 0, 4));
+    }
+
+    public function generateUnionId(string $prefix = 'UA'): string
+    {
+        return $prefix . '-' . now()->format('Y') . '-' . strtoupper(substr(bin2hex(random_bytes(3)), 0, 4));
+    }
+
     public function generateInsuranceId(): string
     {
         return 'ASS-' . now()->format('Ymd') . '-' . strtoupper(substr(bin2hex(random_bytes(3)), 0, 4));

@@ -8,7 +8,7 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('unions', function (Blueprint $table) {
-            $table->id();
+            $table->string('id')->primary();
             $table->string('nom');
             $table->string('type');
             $table->string('province')->nullable();
@@ -17,10 +17,17 @@ return new class extends Migration {
             $table->string('telephone')->nullable();
             $table->string('email')->nullable();
             $table->date('date_creation')->nullable();
+
+            $table->string('president')->nullable();
+            $table->string('secretaire')->nullable();
+            $table->string('tresorier')->nullable();
+            $table->string('commissaire')->nullable();
+
             $table->unsignedInteger('membres_total')->default(0);
             $table->decimal('superficie_totale', 12, 2)->nullable();
             $table->json('cultures_principales')->nullable();
             $table->json('services')->nullable();
+
             $table->timestamps();
         });
     }

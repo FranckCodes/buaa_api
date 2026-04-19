@@ -36,8 +36,7 @@ class AuthServiceProvider extends ServiceProvider
         Conversation::class  => ConversationPolicy::class,
         Document::class      => DocumentPolicy::class,
         Insurance::class     => InsurancePolicy::class,
-        Adhesion::class      => AdhesionPolicy::class,
-    ];
+        Adhesion::class      => AdhesionPolicy::class,    ];
 
     public function boot(): void
     {
