@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Notification;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class NotificationService
 {
@@ -21,16 +22,41 @@ class NotificationService
         ]);
     }
 
+    public function getUserNotifications(string $userId, int $perPage = 15): LengthAwarePaginator
+    {
+        return Notification::with('fromUser')
+            ->where('user_id', $userId)
+            ->latest()
+            ->paginate($perPage);
+    }
+
+    public function getUnreadCount(string $userId): int
+    {
+        return Notification::where('user_id', $userId)
+            ->where('is_read', false)
+            ->count();
+    }
+
     public function markAsRead(Notification $notification): Notification
     {
         $notification->update(['is_read' => true]);
-        return $notification->fresh();
+
+        return $notification->fresh('fromUser');
     }
 
-    public function markAllAsReadForUser(int $userId): void
+    public function markAllAsReadForUser(string $userId): int
     {
-        Notification::where('user_id', $userId)
+        return Notification::where('user_id', $userId)
             ->where('is_read', false)
-            ->update(['is_read' => true]);
+            ->update(['is_read' => true, 'updated_at' => now()]);
+    }
+
+    public function deleteForUser(Notification $notification, string $userId): bool
+    {
+        if ($notification->user_id !== $userId) {
+            return false;
+        }
+
+        return (bool) $notification->delete();
     }
 }

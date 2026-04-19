@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\DocumentController;
 use App\Http\Controllers\Api\InsuranceController;
 use App\Http\Controllers\Api\MessagingController;
 use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\ReferenceController;
 use App\Http\Controllers\Api\ReportController;
@@ -103,6 +104,14 @@ Route::middleware(['auth:sanctum', 'role:client'])->group(function () {
 
 // Tous les utilisateurs authentifiés
 Route::middleware('auth:sanctum')->group(function () {
+    // Notifications
+    Route::get('notifications/unread-count', [NotificationController::class, 'unreadCount']);
+    Route::post('notifications/read-all', [NotificationController::class, 'markAllAsRead']);
+    Route::get('notifications', [NotificationController::class, 'index']);
+    Route::get('notifications/{notification}', [NotificationController::class, 'show']);
+    Route::post('notifications/{notification}/read', [NotificationController::class, 'markAsRead']);
+    Route::delete('notifications/{notification}', [NotificationController::class, 'destroy']);
+
     Route::get('posts', [PostController::class, 'index']);
     Route::get('posts/{post}', [PostController::class, 'show']);
     Route::post('posts', [PostController::class, 'store']);

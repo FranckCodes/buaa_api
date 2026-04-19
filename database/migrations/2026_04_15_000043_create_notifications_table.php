@@ -9,18 +9,27 @@ return new class extends Migration {
     {
         Schema::create('notifications', function (Blueprint $table) {
             $table->id();
+
             $table->string('user_id');
             $table->foreign('user_id')->references('id')->on('users')->cascadeOnDelete();
+
             $table->string('category');
             $table->string('type');
             $table->string('title');
             $table->text('body')->nullable();
+
             $table->boolean('is_read')->default(false);
+
             $table->string('action_label')->nullable();
             $table->string('action_url')->nullable();
+
             $table->string('from_user_id')->nullable();
             $table->foreign('from_user_id')->references('id')->on('users')->nullOnDelete();
+
             $table->timestamps();
+
+            $table->index(['user_id', 'is_read']);
+            $table->index(['user_id', 'created_at']);
         });
     }
 
