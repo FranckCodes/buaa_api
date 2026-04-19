@@ -1,0 +1,349 @@
+LoginRequest:
+  type: object
+  required: [email, password]
+  properties:
+    email:
+      type: string
+      format: email
+      example: admin@buaa.test
+    password:
+      type: string
+      example: password
+
+RegisterRequest:
+  type: object
+  required: [nom_complet, email, password, password_confirmation, role_codes]
+  properties:
+    nom_complet:
+      type: string
+      example: Franck Kapuya
+    email:
+      type: string
+      format: email
+      example: franck@example.com
+    telephone:
+      type: string
+      nullable: true
+      example: "+243827029543"
+    password:
+      type: string
+      example: password123
+    password_confirmation:
+      type: string
+      example: password123
+    role_codes:
+      type: array
+      items:
+        type: string
+      example: [client]
+
+StoreCreditRequest:
+  type: object
+  required: [client_id, credit_type_id, montant_demande, duree_mois]
+  properties:
+    client_id:
+      type: string
+      example: CLT-45678
+    credit_type_id:
+      type: integer
+      example: 1
+    montant_demande:
+      type: number
+      format: float
+      example: 1200
+    duree_mois:
+      type: integer
+      example: 6
+    taux_interet:
+      type: number
+      format: float
+      nullable: true
+    objet_credit:
+      type: string
+      nullable: true
+    description_projet:
+      type: string
+      nullable: true
+    retour_investissement:
+      type: string
+      nullable: true
+    revenus_mensuels:
+      type: number
+      format: float
+      nullable: true
+    autres_credits:
+      type: boolean
+      nullable: true
+    montant_autres_credits:
+      type: number
+      format: float
+      nullable: true
+
+ApproveCreditRequest:
+  type: object
+  required: [montant_approuve, traite_par]
+  properties:
+    montant_approuve:
+      type: number
+      format: float
+      example: 1000
+    montant_echeance:
+      type: number
+      format: float
+      nullable: true
+      example: 166.67
+    prochaine_echeance:
+      type: string
+      format: date
+      nullable: true
+    traite_par:
+      type: string
+      example: ADM-001
+
+StoreOrderRequest:
+  type: object
+  required: [client_id, order_type_id]
+  properties:
+    client_id:
+      type: string
+      example: CLT-45678
+    order_type_id:
+      type: integer
+      example: 3
+    montant:
+      type: number
+      format: float
+      nullable: true
+    description:
+      type: string
+      nullable: true
+    justification:
+      type: string
+      nullable: true
+    quantite:
+      type: number
+      format: float
+      nullable: true
+    unite:
+      type: string
+      nullable: true
+    priorite:
+      type: string
+      enum: [haute, moyenne, basse]
+      default: moyenne
+
+StoreReportRequest:
+  type: object
+  required: [client_id, report_type_id, date_rapport]
+  properties:
+    client_id:
+      type: string
+    superviseur_id:
+      type: string
+      nullable: true
+    report_type_id:
+      type: integer
+    summary:
+      type: string
+      nullable: true
+      maxLength: 300
+    value_numeric:
+      type: number
+      format: float
+      nullable: true
+    value_unit:
+      type: string
+      nullable: true
+    value_text:
+      type: string
+      nullable: true
+    details:
+      type: string
+      nullable: true
+    date_rapport:
+      type: string
+      format: date
+
+StoreSupportTicketRequest:
+  type: object
+  required: [client_id, support_category_id, sujet]
+  properties:
+    client_id:
+      type: string
+    support_category_id:
+      type: integer
+    sujet:
+      type: string
+      maxLength: 255
+    description:
+      type: string
+      nullable: true
+
+StorePostRequest:
+  type: object
+  required: [author_id, content, post_tag_id]
+  properties:
+    author_id:
+      type: string
+    content:
+      type: string
+    post_tag_id:
+      type: integer
+
+StoreInsuranceRequest:
+  type: object
+  required: [client_id, insurance_type_id, montant_annuel]
+  properties:
+    client_id:
+      type: string
+    insurance_type_id:
+      type: integer
+    montant_annuel:
+      type: number
+      format: float
+    description:
+      type: string
+      nullable: true
+    couvertures:
+      type: array
+      items:
+        type: string
+      nullable: true
+    etablissement:
+      type: string
+      nullable: true
+    niveau_etude:
+      type: string
+      nullable: true
+    superficie_hectares:
+      type: number
+      format: float
+      nullable: true
+    type_culture:
+      type: string
+      nullable: true
+    valeur_materiel:
+      type: number
+      format: float
+      nullable: true
+    antecedents_medicaux:
+      type: string
+      nullable: true
+    medecin_traitant:
+      type: string
+      nullable: true
+    beneficiaries:
+      type: array
+      nullable: true
+      items:
+        type: object
+        required: [nom]
+        properties:
+          nom:
+            type: string
+          age:
+            type: integer
+            nullable: true
+          relation:
+            type: string
+            nullable: true
+
+StoreAdhesionRequestRequest:
+  type: object
+  required: [nom, demandeur_type, telephone]
+  properties:
+    nom:
+      type: string
+    demandeur_type:
+      type: string
+      enum: [personne, organisation]
+    client_activity_type_id:
+      type: integer
+      nullable: true
+    client_structure_type_id:
+      type: integer
+      nullable: true
+    representant:
+      type: string
+      nullable: true
+    telephone:
+      type: string
+    email:
+      type: string
+      format: email
+      nullable: true
+    adresse:
+      type: string
+      nullable: true
+    province:
+      type: string
+      nullable: true
+    cotisation:
+      type: number
+      format: float
+      nullable: true
+    membres_nombre:
+      type: integer
+      nullable: true
+    superficie_totale:
+      type: number
+      format: float
+      nullable: true
+    type_culture:
+      type: string
+      nullable: true
+    experience_annees:
+      type: integer
+      nullable: true
+    nombre_animaux:
+      type: integer
+      nullable: true
+    type_elevage:
+      type: string
+      nullable: true
+
+SendMessageRequest:
+  type: object
+  required: [sender_id, type]
+  properties:
+    sender_id:
+      type: string
+    text:
+      type: string
+      nullable: true
+    type:
+      type: string
+      enum: [text, image, file]
+      default: text
+    image_url:
+      type: string
+      nullable: true
+    file_url:
+      type: string
+      nullable: true
+    reply_to_message_id:
+      type: integer
+      nullable: true
+
+AttachDocumentRequest:
+  type: object
+  required: [type_document, nom_fichier, url]
+  properties:
+    type_document:
+      type: string
+      example: business_plan
+    nom_fichier:
+      type: string
+      example: plan_affaire.pdf
+    url:
+      type: string
+      example: https://example.com/uploads/plan_affaire.pdf
+    taille_bytes:
+      type: integer
+      nullable: true
+    mime_type:
+      type: string
+      nullable: true
+    uploaded_by:
+      type: string
+      nullable: true

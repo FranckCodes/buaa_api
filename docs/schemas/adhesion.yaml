@@ -1,0 +1,120 @@
+Cotisation:
+  type: object
+  properties:
+    id:
+      type: integer
+    annee:
+      type: integer
+      example: 2026
+    montant:
+      type: number
+      format: float
+    statut:
+      type: string
+      example: en_attente
+    date_paiement:
+      type: string
+      format: date
+      nullable: true
+    payment_mode:
+      $ref: '#/components/schemas/ReferenceValue'
+    reference_recu:
+      type: string
+      nullable: true
+
+AdhesionRequest:
+  type: object
+  properties:
+    id:
+      type: string
+      example: ADH-20260419-ABCD
+    nom:
+      type: string
+    demandeur_type:
+      type: string
+      enum: [personne, organisation]
+    telephone:
+      type: string
+    email:
+      type: string
+      nullable: true
+    statut:
+      type: string
+      enum: [en_attente, approuve, rejete]
+    date_demande:
+      type: string
+      format: date
+    cotisation:
+      type: number
+      format: float
+      nullable: true
+    treated_by:
+      $ref: '#/components/schemas/User'
+    created_at:
+      type: string
+      format: date-time
+
+Adhesion:
+  type: object
+  properties:
+    id:
+      type: string
+      example: ADH-20260419-ABCD
+    numero_membre:
+      type: string
+      example: MBR-2026-01234
+    client:
+      $ref: '#/components/schemas/Client'
+    union:
+      $ref: '#/components/schemas/Union'
+    type:
+      $ref: '#/components/schemas/ReferenceValue'
+    status:
+      $ref: '#/components/schemas/ReferenceValue'
+    payment_mode:
+      $ref: '#/components/schemas/ReferenceValue'
+    date_adhesion:
+      type: string
+      format: date
+    prochaine_echeance:
+      type: string
+      format: date
+      nullable: true
+    cotisation_initiale:
+      type: number
+      format: float
+    cotisation_annuelle:
+      type: number
+      format: float
+    cotisations:
+      type: array
+      items:
+        $ref: '#/components/schemas/Cotisation'
+    created_at:
+      type: string
+      format: date-time
+
+Union:
+  type: object
+  properties:
+    id:
+      type: string
+      example: UA-2026-ABCD
+    nom:
+      type: string
+    type:
+      type: string
+    province:
+      type: string
+      nullable: true
+    ville:
+      type: string
+      nullable: true
+    president:
+      type: string
+      nullable: true
+    membres_total:
+      type: integer
+    created_at:
+      type: string
+      format: date-time

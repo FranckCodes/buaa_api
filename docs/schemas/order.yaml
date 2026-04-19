@@ -1,0 +1,64 @@
+OrderTracking:
+  type: object
+  properties:
+    id:
+      type: integer
+    label:
+      type: string
+      example: Validation
+    done:
+      type: boolean
+      example: false
+    date_done:
+      type: string
+      format: date
+      nullable: true
+    ordre:
+      type: integer
+      example: 2
+
+Order:
+  type: object
+  properties:
+    id:
+      type: string
+      example: CMD-20260419-EF12
+    client:
+      $ref: '#/components/schemas/Client'
+    type:
+      $ref: '#/components/schemas/ReferenceValue'
+    status:
+      $ref: '#/components/schemas/ReferenceValue'
+    montant:
+      type: number
+      format: float
+      nullable: true
+    description:
+      type: string
+      nullable: true
+    quantite:
+      type: number
+      format: float
+      nullable: true
+    unite:
+      type: string
+      nullable: true
+    priorite:
+      type: string
+      enum: [haute, moyenne, basse]
+      example: haute
+    progression:
+      type: integer
+      example: 10
+    date_soumission:
+      type: string
+      format: date
+    treated_by:
+      $ref: '#/components/schemas/User'
+    tracking_steps:
+      type: array
+      items:
+        $ref: '#/components/schemas/OrderTracking'
+    created_at:
+      type: string
+      format: date-time

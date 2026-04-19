@@ -1,0 +1,165 @@
+BadRequest:
+  description: Requête invalide
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          success:
+            type: boolean
+            example: false
+          message:
+            type: string
+            example: Requête invalide.
+          data:
+            nullable: true
+          meta:
+            nullable: true
+          errors:
+            nullable: true
+
+Unauthorized:
+  description: Non authentifié
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          success:
+            type: boolean
+            example: false
+          message:
+            type: string
+            example: Non authentifié.
+          data:
+            nullable: true
+          meta:
+            nullable: true
+          errors:
+            nullable: true
+
+Forbidden:
+  description: Accès refusé
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          success:
+            type: boolean
+            example: false
+          message:
+            type: string
+            example: Accès non autorisé.
+          data:
+            nullable: true
+          meta:
+            nullable: true
+          errors:
+            nullable: true
+
+NotFound:
+  description: Ressource introuvable
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          success:
+            type: boolean
+            example: false
+          message:
+            type: string
+            example: Ressource introuvable.
+          data:
+            nullable: true
+          meta:
+            nullable: true
+          errors:
+            nullable: true
+
+ValidationError:
+  description: Erreur de validation
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          success:
+            type: boolean
+            example: false
+          message:
+            type: string
+            example: Les données envoyées sont invalides.
+          data:
+            nullable: true
+          meta:
+            nullable: true
+          errors:
+            type: object
+            additionalProperties:
+              type: array
+              items:
+                type: string
+            example:
+              client_id: ["Le champ client id est obligatoire."]
+
+BusinessError:
+  description: Erreur métier
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          success:
+            type: boolean
+            example: false
+          message:
+            type: string
+            example: Ce crédit est déjà approuvé.
+          data:
+            nullable: true
+          meta:
+            nullable: true
+          errors:
+            nullable: true
+
+Success:
+  description: Opération réussie
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          success:
+            type: boolean
+            example: true
+          message:
+            type: string
+            example: Opération réussie.
+          data:
+            nullable: true
+          meta:
+            nullable: true
+          errors:
+            nullable: true
+
+Created:
+  description: Ressource créée avec succès
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          success:
+            type: boolean
+            example: true
+          message:
+            type: string
+            example: Ressource créée avec succès.
+          data:
+            nullable: true
+          meta:
+            nullable: true
+          errors:
+            nullable: true

@@ -1,0 +1,101 @@
+User:
+  type: object
+  properties:
+    id:
+      type: string
+      example: CLT-45678
+    nom_complet:
+      type: string
+      example: Franck Kapuya
+    email:
+      type: string
+      format: email
+      example: franck@example.com
+    telephone:
+      type: string
+      nullable: true
+      example: "+243827029543"
+    photo_profil:
+      type: string
+      nullable: true
+    derniere_connexion:
+      type: string
+      format: date-time
+      nullable: true
+    status:
+      $ref: '#/components/schemas/ReferenceValue'
+    roles:
+      type: array
+      items:
+        $ref: '#/components/schemas/ReferenceValue'
+    created_at:
+      type: string
+      format: date-time
+
+Client:
+  type: object
+  properties:
+    id:
+      type: string
+      example: CLT-45678
+    user:
+      $ref: '#/components/schemas/User'
+    date_naissance:
+      type: string
+      format: date
+      nullable: true
+    lieu_naissance:
+      type: string
+      nullable: true
+    sexe:
+      type: string
+      nullable: true
+      enum: [M, F]
+    etat_civil:
+      type: string
+      nullable: true
+      enum: [celibataire, marie, divorce, veuf]
+    adresse_complete:
+      type: string
+      nullable: true
+    ville:
+      type: string
+      nullable: true
+    province:
+      type: string
+      nullable: true
+    territoire:
+      type: string
+      nullable: true
+    activity_type:
+      $ref: '#/components/schemas/ReferenceValue'
+    structure_type:
+      $ref: '#/components/schemas/ReferenceValue'
+    profession_detaillee:
+      type: string
+      nullable: true
+    experience_annees:
+      type: integer
+      example: 5
+    superficie_exploitation:
+      type: number
+      format: float
+      nullable: true
+    revenus_mensuels:
+      type: number
+      format: float
+      nullable: true
+    reference:
+      type: object
+      properties:
+        nom:
+          type: string
+          nullable: true
+        telephone:
+          type: string
+          nullable: true
+        relation:
+          type: string
+          nullable: true
+    superviseur:
+      $ref: '#/components/schemas/User'

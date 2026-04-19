@@ -1,0 +1,99 @@
+InsuranceBeneficiary:
+  type: object
+  properties:
+    id:
+      type: integer
+    nom:
+      type: string
+    age:
+      type: integer
+      nullable: true
+    relation:
+      type: string
+      nullable: true
+
+InsuranceClaim:
+  type: object
+  properties:
+    id:
+      type: string
+      example: REC-20260419-ABCD
+    type_sinistre:
+      type: string
+    montant_reclame:
+      type: number
+      format: float
+    montant_approuve:
+      type: number
+      format: float
+      nullable: true
+    statut:
+      type: string
+      enum: [en_analyse, approuve, rejete, rembourse]
+    description:
+      type: string
+      nullable: true
+    date_sinistre:
+      type: string
+      format: date
+      nullable: true
+    date_soumission:
+      type: string
+      format: date
+    treated_by:
+      $ref: '#/components/schemas/User'
+    created_at:
+      type: string
+      format: date-time
+
+Insurance:
+  type: object
+  properties:
+    id:
+      type: string
+      example: ASS-20260419-ABCD
+    client:
+      $ref: '#/components/schemas/Client'
+    type:
+      $ref: '#/components/schemas/ReferenceValue'
+    status:
+      $ref: '#/components/schemas/ReferenceValue'
+    montant_annuel:
+      type: number
+      format: float
+    date_souscription:
+      type: string
+      format: date
+    date_debut:
+      type: string
+      format: date
+      nullable: true
+    date_fin:
+      type: string
+      format: date
+      nullable: true
+    prochaine_echeance:
+      type: string
+      format: date
+      nullable: true
+    description:
+      type: string
+      nullable: true
+    couvertures:
+      type: array
+      items:
+        type: string
+      nullable: true
+    treated_by:
+      $ref: '#/components/schemas/User'
+    beneficiaries:
+      type: array
+      items:
+        $ref: '#/components/schemas/InsuranceBeneficiary'
+    claims:
+      type: array
+      items:
+        $ref: '#/components/schemas/InsuranceClaim'
+    created_at:
+      type: string
+      format: date-time

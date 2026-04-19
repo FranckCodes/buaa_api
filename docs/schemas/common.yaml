@@ -1,0 +1,67 @@
+ApiResponse:
+  type: object
+  properties:
+    success:
+      type: boolean
+      example: true
+    message:
+      type: string
+      example: Opération réussie.
+    data:
+      nullable: true
+    meta:
+      $ref: '#/components/schemas/PaginatedMeta'
+    errors:
+      type: object
+      nullable: true
+      additionalProperties:
+        type: array
+        items:
+          type: string
+
+PaginatedMeta:
+  type: object
+  nullable: true
+  properties:
+    current_page:
+      type: integer
+      example: 1
+    last_page:
+      type: integer
+      example: 4
+    per_page:
+      type: integer
+      example: 15
+    total:
+      type: integer
+      example: 60
+    from:
+      type: integer
+      nullable: true
+      example: 1
+    to:
+      type: integer
+      nullable: true
+      example: 15
+
+ReferenceValue:
+  type: object
+  properties:
+    id:
+      type: integer
+      example: 1
+    code:
+      type: string
+      example: actif
+    label:
+      type: string
+      example: Actif
+    description:
+      type: string
+      nullable: true
+    is_active:
+      type: boolean
+      example: true
+    sort_order:
+      type: integer
+      example: 1

@@ -1,0 +1,214 @@
+Comment:
+  type: object
+  properties:
+    id:
+      type: integer
+    author:
+      $ref: '#/components/schemas/User'
+    text:
+      type: string
+    created_at:
+      type: string
+      format: date-time
+
+Post:
+  type: object
+  properties:
+    id:
+      type: integer
+      example: 1
+    author:
+      $ref: '#/components/schemas/User'
+    content:
+      type: string
+    tag:
+      $ref: '#/components/schemas/ReferenceValue'
+    status:
+      $ref: '#/components/schemas/ReferenceValue'
+    validated_by:
+      $ref: '#/components/schemas/User'
+    motif_rejet:
+      type: string
+      nullable: true
+    likes_count:
+      type: integer
+      example: 3
+    comments:
+      type: array
+      items:
+        $ref: '#/components/schemas/Comment'
+    created_at:
+      type: string
+      format: date-time
+
+Notification:
+  type: object
+  properties:
+    id:
+      type: integer
+    category:
+      type: string
+      example: feed
+      enum: [app, feed]
+    type:
+      type: string
+      example: comment
+    title:
+      type: string
+    body:
+      type: string
+      nullable: true
+    is_read:
+      type: boolean
+      example: false
+    action_label:
+      type: string
+      nullable: true
+    action_url:
+      type: string
+      nullable: true
+    from_user:
+      $ref: '#/components/schemas/User'
+    created_at:
+      type: string
+      format: date-time
+
+Message:
+  type: object
+  properties:
+    id:
+      type: integer
+    sender:
+      $ref: '#/components/schemas/User'
+    text:
+      type: string
+      nullable: true
+    type:
+      type: string
+      enum: [text, image, file]
+    image_url:
+      type: string
+      nullable: true
+    file_url:
+      type: string
+      nullable: true
+    status:
+      type: string
+      enum: [sent, delivered, read]
+    deleted_at:
+      type: string
+      format: date-time
+      nullable: true
+    created_at:
+      type: string
+      format: date-time
+
+Conversation:
+  type: object
+  properties:
+    id:
+      type: integer
+    last_message_at:
+      type: string
+      format: date-time
+      nullable: true
+    participants:
+      type: array
+      items:
+        $ref: '#/components/schemas/User'
+    messages:
+      type: array
+      items:
+        $ref: '#/components/schemas/Message'
+    created_at:
+      type: string
+      format: date-time
+
+Document:
+  type: object
+  properties:
+    id:
+      type: integer
+    type_document:
+      type: string
+      example: piece_identite
+    nom_fichier:
+      type: string
+      example: id.pdf
+    url:
+      type: string
+    taille_bytes:
+      type: integer
+      nullable: true
+    mime_type:
+      type: string
+      nullable: true
+    uploaded_by:
+      $ref: '#/components/schemas/User'
+    created_at:
+      type: string
+      format: date-time
+
+Report:
+  type: object
+  properties:
+    id:
+      type: string
+      example: RPT-20260419-ZX90
+    client:
+      $ref: '#/components/schemas/Client'
+    superviseur:
+      $ref: '#/components/schemas/User'
+    type:
+      $ref: '#/components/schemas/ReferenceValue'
+    status:
+      $ref: '#/components/schemas/ReferenceValue'
+    summary:
+      type: string
+      nullable: true
+    value_numeric:
+      type: number
+      format: float
+      nullable: true
+    value_unit:
+      type: string
+      nullable: true
+    date_rapport:
+      type: string
+      format: date
+    validated_by:
+      $ref: '#/components/schemas/User'
+    motif_rejet:
+      type: string
+      nullable: true
+    created_at:
+      type: string
+      format: date-time
+
+SupportTicket:
+  type: object
+  properties:
+    id:
+      type: string
+      example: "#4521"
+    client:
+      $ref: '#/components/schemas/Client'
+    category:
+      $ref: '#/components/schemas/ReferenceValue'
+    sujet:
+      type: string
+    description:
+      type: string
+      nullable: true
+    statut:
+      type: string
+      enum: [ouvert, en_cours, resolu, ferme]
+    treated_by:
+      $ref: '#/components/schemas/User'
+    resolved_at:
+      type: string
+      format: date-time
+      nullable: true
+    created_at:
+      type: string
+      format: date-time

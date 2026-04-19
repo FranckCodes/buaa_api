@@ -1,0 +1,85 @@
+CreditPayment:
+  type: object
+  properties:
+    id:
+      type: integer
+    periode_annee:
+      type: integer
+      example: 2026
+    periode_mois:
+      type: integer
+      example: 5
+    montant:
+      type: number
+      format: float
+      example: 200.00
+    statut:
+      type: string
+      example: en_attente
+      enum: [en_attente, paye]
+    date_paiement:
+      type: string
+      format: date
+      nullable: true
+    date_echeance:
+      type: string
+      format: date
+
+Credit:
+  type: object
+  properties:
+    id:
+      type: string
+      example: CRD-20260419-ABCD
+    client:
+      $ref: '#/components/schemas/Client'
+    type:
+      $ref: '#/components/schemas/ReferenceValue'
+    status:
+      $ref: '#/components/schemas/ReferenceValue'
+    montant_demande:
+      type: number
+      format: float
+      example: 1200
+    montant_approuve:
+      type: number
+      format: float
+      nullable: true
+    montant_rembourse:
+      type: number
+      format: float
+      example: 0
+    date_demande:
+      type: string
+      format: date
+    date_approbation:
+      type: string
+      format: date
+      nullable: true
+    duree_mois:
+      type: integer
+      example: 6
+    taux_interet:
+      type: number
+      format: float
+      nullable: true
+    prochaine_echeance:
+      type: string
+      format: date
+      nullable: true
+    montant_echeance:
+      type: number
+      format: float
+      nullable: true
+    objet_credit:
+      type: string
+      nullable: true
+    treated_by:
+      $ref: '#/components/schemas/User'
+    payments:
+      type: array
+      items:
+        $ref: '#/components/schemas/CreditPayment'
+    created_at:
+      type: string
+      format: date-time
