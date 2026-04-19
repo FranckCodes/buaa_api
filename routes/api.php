@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AdhesionController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ClientController;
 use App\Http\Controllers\Api\CreditController;
+use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\DocumentController;
 use App\Http\Controllers\Api\InsuranceController;
 use App\Http\Controllers\Api\MessagingController;
@@ -14,6 +15,22 @@ use App\Http\Controllers\Api\ReferenceController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\SupportTicketController;
 use Illuminate\Support\Facades\Route;
+
+// Dashboard
+Route::prefix('dashboard')->middleware('auth:sanctum')->group(function () {
+    Route::get('admin/overview', [DashboardController::class, 'adminOverview'])
+        ->middleware('role:super_admin,admin');
+    Route::get('admin/trends', [DashboardController::class, 'adminTrends'])
+        ->middleware('role:super_admin,admin');
+    Route::get('admin/kpis', [DashboardController::class, 'adminKpis'])
+        ->middleware('role:super_admin,admin');
+    Route::get('admin/recent-activity', [DashboardController::class, 'adminRecentActivity'])
+        ->middleware('role:super_admin,admin');
+    Route::get('supervisor/overview', [DashboardController::class, 'supervisorOverview'])
+        ->middleware('role:super_admin,admin,superviseur');
+    Route::get('client/overview', [DashboardController::class, 'clientOverview'])
+        ->middleware('role:client');
+});
 
 // Auth (public)
 Route::prefix('auth')->group(function () {
