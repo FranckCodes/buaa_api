@@ -13,7 +13,7 @@ class ModeratePostRequest extends FormRequest
     {
         return [
             'action'       => ['required', Rule::in(['approve', 'reject'])],
-            'validator_id' => ['required', 'integer', 'exists:users,id'],
+            'validator_id' => ['required', 'string', 'exists:users,id'],
             'reason'       => ['nullable', 'string'],
         ];
     }

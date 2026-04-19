@@ -9,12 +9,14 @@ return new class extends Migration {
     {
         Schema::create('follows', function (Blueprint $table) {
             $table->id();
-            $table->string('follower_id');
-            $table->foreign('follower_id')->references('id')->on('users')->cascadeOnDelete();
-            $table->string('following_id');
-            $table->foreign('following_id')->references('id')->on('users')->cascadeOnDelete();
-            $table->timestamps();
 
+            $table->string('follower_id');
+            $table->string('following_id');
+
+            $table->foreign('follower_id')->references('id')->on('users')->cascadeOnDelete();
+            $table->foreign('following_id')->references('id')->on('users')->cascadeOnDelete();
+
+            $table->timestamps();
             $table->unique(['follower_id', 'following_id']);
         });
     }

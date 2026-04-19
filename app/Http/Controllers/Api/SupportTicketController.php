@@ -18,8 +18,8 @@ class SupportTicketController extends Controller
 
         return $this->paginatedResponse(
             SupportTicket::with(['client.user', 'category', 'treatedBy'])->latest()->paginate(15),
-            'Liste des tickets récupérée avec succès.',
-            fn ($item) => new SupportTicketResource($item)
+            'Liste des tickets de support récupérée avec succès.',
+            fn ($ticket) => new SupportTicketResource($ticket)
         );
     }
 
@@ -27,8 +27,10 @@ class SupportTicketController extends Controller
     {
         $this->authorize('create', SupportTicket::class);
 
+        $ticket = $supportTicketService->createTicket($request->validated());
+
         return $this->successResponse(
-            new SupportTicketResource($supportTicketService->createTicket($request->validated())->load(['client.user', 'category'])),
+            new SupportTicketResource($ticket->load(['client.user', 'category', 'treatedBy'])),
             'Ticket créé avec succès.',
             201
         );
@@ -49,7 +51,7 @@ class SupportTicketController extends Controller
         $this->authorize('assign', $supportTicket);
 
         return $this->successResponse(
-            new SupportTicketResource($supportTicketService->assignTicket($supportTicket, $request->integer('agent_id'))),
+            new SupportTicketResource($supportTicketService->assignTicket($supportTicket, $request->string('agent_id')->toString())),
             'Ticket assigné avec succès.'
         );
     }

@@ -19,6 +19,9 @@ class DatabaseSeeder extends Seeder
             OrderStatusSeeder::class,
             ReportTypeSeeder::class,
             ReportStatusSeeder::class,
+            SupportCategorySeeder::class,
+            PostTagSeeder::class,
+            PostStatusSeeder::class,
             SuperAdminSeeder::class,
         ]);
     }

@@ -8,9 +8,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SupportTicket extends Model
 {
+    public $incrementing = false;
+    protected $keyType = 'string';
+
     protected $fillable = [
-        'client_id', 'support_category_id', 'sujet', 'description',
-        'statut', 'traite_par', 'resolved_at',
+        'id', 'client_id', 'support_category_id',
+        'sujet', 'description', 'statut', 'traite_par', 'resolved_at',
     ];
 
     protected $casts = ['resolved_at' => 'datetime'];

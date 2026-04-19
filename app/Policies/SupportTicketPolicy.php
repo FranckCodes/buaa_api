@@ -18,7 +18,7 @@ class SupportTicketPolicy
     {
         if ($user->isAdminLike()) return true;
         if ($user->isSupervisor() && $ticket->client?->superviseur_id === $user->id) return true;
-        return $user->id === $ticket->client?->user_id;
+        return $user->id === $ticket->client_id;
     }
 
     public function create(User $user): bool { return $user->isClient() || $user->isAdminLike(); }

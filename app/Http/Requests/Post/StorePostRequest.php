@@ -11,7 +11,7 @@ class StorePostRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'author_id'   => ['required', 'integer', 'exists:users,id'],
+            'author_id'   => ['required', 'string', 'exists:users,id'],
             'content'     => ['required', 'string'],
             'post_tag_id' => ['required', 'integer', 'exists:post_tags,id'],
         ];

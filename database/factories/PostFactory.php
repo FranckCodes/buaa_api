@@ -17,8 +17,10 @@ class PostFactory extends Factory
         return [
             'author_id'      => User::factory(),
             'content'        => fake()->paragraph(),
-            'post_tag_id'    => PostTag::first()?->id,
+            'post_tag_id'    => PostTag::query()->first()?->id,
             'post_status_id' => PostStatus::where('code', 'pending')->first()?->id,
+            'valide_par'     => null,
+            'motif_rejet'    => null,
             'likes_count'    => 0,
         ];
     }

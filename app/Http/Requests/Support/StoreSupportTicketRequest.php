@@ -11,7 +11,7 @@ class StoreSupportTicketRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'client_id'           => ['required', 'integer', 'exists:clients,id'],
+            'client_id'           => ['required', 'string', 'exists:clients,id'],
             'support_category_id' => ['required', 'integer', 'exists:support_categories,id'],
             'sujet'               => ['required', 'string', 'max:255'],
             'description'         => ['nullable', 'string'],

@@ -12,7 +12,7 @@ class PostPolicy
         return $user->isSuperAdmin() ? true : null;
     }
 
-    public function viewAny(?User $user): bool { return true; }
+    public function viewAny(?User $user = null): bool { return true; }
     public function view(?User $user, Post $post): bool { return true; }
     public function create(User $user): bool { return $user->isClient() || $user->isStaff(); }
 

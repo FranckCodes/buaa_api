@@ -18,9 +18,12 @@ class PostController extends Controller
     public function index(): JsonResponse
     {
         return $this->paginatedResponse(
-            Post::with(['author', 'tag', 'status', 'media'])->latest()->paginate(15),
+            Post::with(['author', 'tag', 'status', 'media'])
+                ->withCount(['likedByUsers', 'savedByUsers'])
+                ->latest()
+                ->paginate(15),
             'Liste des publications récupérée avec succès.',
-            fn ($item) => new PostResource($item)
+            fn ($post) => new PostResource($post)
         );
     }
 
@@ -28,8 +31,10 @@ class PostController extends Controller
     {
         $this->authorize('create', Post::class);
 
+        $post = $postService->createPost($request->validated());
+
         return $this->successResponse(
-            new PostResource($postService->createPost($request->validated())->load(['author', 'tag', 'status'])),
+            new PostResource($post->load(['author', 'tag', 'status'])),
             'Publication créée avec succès.',
             201
         );
@@ -37,8 +42,11 @@ class PostController extends Controller
 
     public function show(Post $post): JsonResponse
     {
+        $post->load(['author', 'tag', 'status', 'validatedBy', 'media', 'comments.author'])
+            ->loadCount(['likedByUsers', 'savedByUsers']);
+
         return $this->successResponse(
-            new PostResource($post->load(['author', 'tag', 'status', 'media', 'comments.author'])),
+            new PostResource($post),
             'Détail de la publication récupéré avec succès.'
         );
     }
@@ -46,36 +54,47 @@ class PostController extends Controller
     public function moderate(ModeratePostRequest $request, Post $post, PostService $postService): JsonResponse
     {
         $this->authorize('moderate', $post);
-        $data = $request->validated();
 
+        $data   = $request->validated();
         $result = $data['action'] === 'approve'
             ? $postService->approvePost($post, $data['validator_id'])
             : $postService->rejectPost($post, $data['validator_id'], $data['reason'] ?? null);
 
-        return $this->successResponse(new PostResource($result), 'Action effectuée avec succès.');
+        return $this->successResponse(new PostResource($result), 'Action sur la publication effectuée avec succès.');
     }
 
     public function toggleLike(Request $request, Post $post, PostService $postService): JsonResponse
     {
-        $this->authorize('interact', $post);
-        $request->validate(['user_id' => ['required', 'integer', 'exists:users,id']]);
+        $this->authorize('interact', Post::class);
+        $request->validate(['user_id' => ['required', 'string', 'exists:users,id']]);
 
-        return $this->successResponse($postService->toggleLike($post, $request->integer('user_id')), 'Action sur le like effectuée.');
+        return $this->successResponse(
+            $postService->toggleLike($post, $request->string('user_id')->toString()),
+            'Action sur le like effectuée avec succès.'
+        );
     }
 
     public function toggleSave(Request $request, Post $post, PostService $postService): JsonResponse
     {
-        $this->authorize('interact', $post);
-        $request->validate(['user_id' => ['required', 'integer', 'exists:users,id']]);
+        $this->authorize('interact', Post::class);
+        $request->validate(['user_id' => ['required', 'string', 'exists:users,id']]);
 
-        return $this->successResponse($postService->toggleSave($post, $request->integer('user_id')), 'Action sur la sauvegarde effectuée.');
+        return $this->successResponse(
+            $postService->toggleSave($post, $request->string('user_id')->toString()),
+            'Action sur la sauvegarde effectuée avec succès.'
+        );
     }
 
     public function addComment(StoreCommentRequest $request, Post $post, PostService $postService): JsonResponse
     {
-        $this->authorize('interact', $post);
-        $comment = $postService->addComment($post, $request->integer('user_id'), $request->string('text')->toString());
+        $this->authorize('interact', Post::class);
 
-        return $this->successResponse(new CommentResource($comment->load('author')), 'Commentaire ajouté avec succès.', 201);
+        $comment = $postService->addComment(
+            $post,
+            $request->string('user_id')->toString(),
+            $request->string('text')->toString()
+        );
+
+        return $this->successResponse(new CommentResource($comment), 'Commentaire ajouté avec succès.', 201);
     }
 }

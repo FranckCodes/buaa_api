@@ -14,12 +14,14 @@ class SupportTicketFactory extends Factory
     public function definition(): array
     {
         return [
+            'id'                  => '#' . str_pad((string) fake()->unique()->numberBetween(1, 9999), 4, '0', STR_PAD_LEFT),
             'client_id'           => Client::factory(),
-            'support_category_id' => SupportCategory::first()?->id,
-            'sujet'               => fake()->sentence(),
+            'support_category_id' => SupportCategory::query()->first()?->id,
+            'sujet'               => fake()->sentence(4),
             'description'         => fake()->paragraph(),
             'statut'              => 'ouvert',
             'traite_par'          => null,
+            'resolved_at'         => null,
         ];
     }
 }

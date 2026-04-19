@@ -11,7 +11,7 @@ class AssignSupportTicketRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'agent_id' => ['required', 'integer', 'exists:users,id'],
+            'agent_id' => ['required', 'string', 'exists:users,id'],
         ];
     }
 }

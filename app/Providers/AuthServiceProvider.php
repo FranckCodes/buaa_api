@@ -30,10 +30,10 @@ class AuthServiceProvider extends ServiceProvider
         Credit::class        => CreditPolicy::class,
         Order::class         => OrderPolicy::class,
         Report::class        => ReportPolicy::class,
+        SupportTicket::class => SupportTicketPolicy::class,
+        Post::class          => PostPolicy::class,
         Adhesion::class      => AdhesionPolicy::class,
         Insurance::class     => InsurancePolicy::class,
-        Post::class          => PostPolicy::class,
-        SupportTicket::class => SupportTicketPolicy::class,
         Conversation::class  => ConversationPolicy::class,
         Document::class      => DocumentPolicy::class,
     ];

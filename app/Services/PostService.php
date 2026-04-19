@@ -26,7 +26,7 @@ class PostService
         ]);
     }
 
-    public function approvePost(Post $post, int $validatorId): Post
+    public function approvePost(Post $post, string $validatorId): Post
     {
         $status = PostStatus::where('code', 'approved')->firstOrFail();
 
@@ -36,10 +36,20 @@ class PostService
             'motif_rejet'    => null,
         ]);
 
-        return $post->fresh('status');
+        if ($post->author_id !== $validatorId) {
+            $this->notificationService->create([
+                'user_id'  => $post->author_id,
+                'category' => 'feed',
+                'type'     => 'success',
+                'title'    => 'Publication approuvée',
+                'body'     => 'Votre publication a été approuvée.',
+            ]);
+        }
+
+        return $post->fresh(['status', 'tag', 'author', 'validatedBy']);
     }
 
-    public function rejectPost(Post $post, int $validatorId, ?string $reason): Post
+    public function rejectPost(Post $post, string $validatorId, ?string $reason): Post
     {
         $status = PostStatus::where('code', 'rejected')->firstOrFail();
 
@@ -49,10 +59,20 @@ class PostService
             'motif_rejet'    => $reason,
         ]);
 
-        return $post->fresh('status');
+        if ($post->author_id !== $validatorId) {
+            $this->notificationService->create([
+                'user_id'  => $post->author_id,
+                'category' => 'feed',
+                'type'     => 'alert',
+                'title'    => 'Publication rejetée',
+                'body'     => 'Votre publication a été rejetée.',
+            ]);
+        }
+
+        return $post->fresh(['status', 'tag', 'author', 'validatedBy']);
     }
 
-    public function toggleLike(Post $post, int $userId): array
+    public function toggleLike(Post $post, string $userId): array
     {
         $existing = PostLike::where('post_id', $post->id)->where('user_id', $userId)->first();
 
@@ -80,7 +100,7 @@ class PostService
         return ['liked' => true, 'likes_count' => $post->fresh()->likes_count];
     }
 
-    public function toggleSave(Post $post, int $userId): array
+    public function toggleSave(Post $post, string $userId): array
     {
         $existing = PostSave::where('post_id', $post->id)->where('user_id', $userId)->first();
 
@@ -94,7 +114,7 @@ class PostService
         return ['saved' => true];
     }
 
-    public function addComment(Post $post, int $userId, string $text): Comment
+    public function addComment(Post $post, string $userId, string $text): Comment
     {
         $comment = Comment::create([
             'post_id'   => $post->id,
@@ -108,11 +128,11 @@ class PostService
                 'category'     => 'feed',
                 'type'         => 'comment',
                 'title'        => 'Nouveau commentaire',
-                'body'         => 'Quelqu\'un a commenté votre publication.',
+                'body'         => "Quelqu'un a commenté votre publication.",
                 'from_user_id' => $userId,
             ]);
         }
 
-        return $comment;
+        return $comment->load('author');
     }
 }
