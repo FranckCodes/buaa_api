@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             PostStatusSeeder::class,
             SupportCategorySeeder::class,
             PaymentModeSeeder::class,
+            SuperAdminSeeder::class,
         ]);
     }
 }
