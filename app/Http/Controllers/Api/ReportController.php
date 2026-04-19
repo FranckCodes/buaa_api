@@ -19,7 +19,7 @@ class ReportController extends Controller
         return $this->paginatedResponse(
             Report::with(['client.user', 'superviseur', 'type', 'status'])->latest()->paginate(15),
             'Liste des rapports récupérée avec succès.',
-            fn ($item) => new ReportResource($item)
+            fn ($report) => new ReportResource($report)
         );
     }
 
@@ -27,8 +27,10 @@ class ReportController extends Controller
     {
         $this->authorize('create', Report::class);
 
+        $report = $reportService->createReport($request->validated());
+
         return $this->successResponse(
-            new ReportResource($reportService->createReport($request->validated())->load(['client.user', 'type', 'status'])),
+            new ReportResource($report->load(['client.user', 'superviseur', 'type', 'status'])),
             'Rapport créé avec succès.',
             201
         );
@@ -39,7 +41,7 @@ class ReportController extends Controller
         $this->authorize('view', $report);
 
         return $this->successResponse(
-            new ReportResource($report->load(['client.user', 'superviseur', 'type', 'status', 'validatedBy', 'documents'])),
+            new ReportResource($report->load(['client.user', 'superviseur', 'type', 'status', 'validatedBy'])),
             'Détail du rapport récupéré avec succès.'
         );
     }
@@ -47,6 +49,7 @@ class ReportController extends Controller
     public function moderate(ModerateReportRequest $request, Report $report, ReportService $reportService): JsonResponse
     {
         $this->authorize('moderate', $report);
+
         $data = $request->validated();
 
         $result = match ($data['action']) {

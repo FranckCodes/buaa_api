@@ -41,6 +41,11 @@ class IdGeneratorService
         return 'CMD-' . now()->format('Ymd') . '-' . strtoupper(substr(bin2hex(random_bytes(3)), 0, 4));
     }
 
+    public function generateReportId(): string
+    {
+        return 'RPT-' . now()->format('Ymd') . '-' . strtoupper(substr(bin2hex(random_bytes(3)), 0, 4));
+    }
+
     public function generateMembershipNumber(): string
     {
         return 'MBR-' . Carbon::now()->format('Y') . '-' . str_pad((string) random_int(1, 99999), 5, '0', STR_PAD_LEFT);

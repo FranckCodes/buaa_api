@@ -2,12 +2,14 @@
 
 namespace App\Services;
 
-use App\Models\Reference\ReportStatus;
+use App\Exceptions\BusinessException;
 use App\Models\Report;
+use App\Models\Reference\ReportStatus;
 
 class ReportService
 {
     public function __construct(
+        protected IdGeneratorService $idGenerator,
         protected NotificationService $notificationService
     ) {}
 
@@ -16,6 +18,7 @@ class ReportService
         $status = ReportStatus::where('code', 'submitted')->firstOrFail();
 
         return Report::create([
+            'id'               => $this->idGenerator->generateReportId(),
             'client_id'        => $data['client_id'],
             'superviseur_id'   => $data['superviseur_id'] ?? null,
             'report_type_id'   => $data['report_type_id'],
@@ -29,8 +32,12 @@ class ReportService
         ]);
     }
 
-    public function validateReport(Report $report, int $validatorId): Report
+    public function validateReport(Report $report, string $validatorId): Report
     {
+        if ($report->status?->code === 'validated') {
+            throw new BusinessException('Ce rapport est déjà validé.', 422);
+        }
+
         $status = ReportStatus::where('code', 'validated')->firstOrFail();
 
         $report->update([
@@ -39,10 +46,18 @@ class ReportService
             'motif_rejet'      => null,
         ]);
 
-        return $report->fresh('status');
+        $this->notificationService->create([
+            'user_id'  => $report->client_id,
+            'category' => 'app',
+            'type'     => 'success',
+            'title'    => 'Rapport validé',
+            'body'     => 'Votre rapport a été validé.',
+        ]);
+
+        return $report->fresh(['status', 'type', 'client']);
     }
 
-    public function requestRevision(Report $report, int $validatorId, ?string $reason): Report
+    public function requestRevision(Report $report, string $validatorId, ?string $reason): Report
     {
         $status = ReportStatus::where('code', 'revision')->firstOrFail();
 
@@ -52,10 +67,18 @@ class ReportService
             'motif_rejet'      => $reason,
         ]);
 
-        return $report->fresh('status');
+        $this->notificationService->create([
+            'user_id'  => $report->client_id,
+            'category' => 'app',
+            'type'     => 'info',
+            'title'    => 'Rapport à corriger',
+            'body'     => 'Votre rapport nécessite une révision.',
+        ]);
+
+        return $report->fresh(['status', 'type', 'client']);
     }
 
-    public function rejectReport(Report $report, int $validatorId, ?string $reason): Report
+    public function rejectReport(Report $report, string $validatorId, ?string $reason): Report
     {
         $status = ReportStatus::where('code', 'rejected')->firstOrFail();
 
@@ -65,6 +88,14 @@ class ReportService
             'motif_rejet'      => $reason,
         ]);
 
-        return $report->fresh('status');
+        $this->notificationService->create([
+            'user_id'  => $report->client_id,
+            'category' => 'app',
+            'type'     => 'alert',
+            'title'    => 'Rapport rejeté',
+            'body'     => 'Votre rapport a été rejeté.',
+        ]);
+
+        return $report->fresh(['status', 'type', 'client']);
     }
 }

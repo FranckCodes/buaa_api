@@ -18,7 +18,7 @@ class ReportPolicy
     {
         if ($user->isAdminLike()) return true;
         if ($user->isSupervisor() && $report->superviseur_id === $user->id) return true;
-        return $user->id === $report->client?->user_id;
+        return $user->id === $report->client_id;
     }
 
     public function create(User $user): bool { return $user->isClient() || $user->isAdminLike(); }

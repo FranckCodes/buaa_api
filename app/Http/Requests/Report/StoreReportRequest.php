@@ -11,8 +11,8 @@ class StoreReportRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'client_id'      => ['required', 'integer', 'exists:clients,id'],
-            'superviseur_id' => ['nullable', 'integer', 'exists:users,id'],
+            'client_id'      => ['required', 'string', 'exists:clients,id'],
+            'superviseur_id' => ['nullable', 'string', 'exists:users,id'],
             'report_type_id' => ['required', 'integer', 'exists:report_types,id'],
             'summary'        => ['nullable', 'string', 'max:300'],
             'value_numeric'  => ['nullable', 'numeric'],

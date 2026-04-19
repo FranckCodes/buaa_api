@@ -26,16 +26,16 @@ use App\Policies\SupportTicketPolicy;use Illuminate\Foundation\Support\Providers
 class AuthServiceProvider extends ServiceProvider
 {
     protected $policies = [
-        Client::class       => ClientPolicy::class,
-        Credit::class       => CreditPolicy::class,
-        Order::class        => OrderPolicy::class,
-        Adhesion::class     => AdhesionPolicy::class,
-        Insurance::class    => InsurancePolicy::class,
-        Report::class       => ReportPolicy::class,
-        Post::class         => PostPolicy::class,
+        Client::class        => ClientPolicy::class,
+        Credit::class        => CreditPolicy::class,
+        Order::class         => OrderPolicy::class,
+        Report::class        => ReportPolicy::class,
+        Adhesion::class      => AdhesionPolicy::class,
+        Insurance::class     => InsurancePolicy::class,
+        Post::class          => PostPolicy::class,
         SupportTicket::class => SupportTicketPolicy::class,
-        Conversation::class => ConversationPolicy::class,
-        Document::class     => DocumentPolicy::class,
+        Conversation::class  => ConversationPolicy::class,
+        Document::class      => DocumentPolicy::class,
     ];
 
     public function boot(): void
