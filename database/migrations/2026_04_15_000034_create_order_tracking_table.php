@@ -10,7 +10,7 @@ return new class extends Migration {
         Schema::create('order_tracking', function (Blueprint $table) {
             $table->id();
 
-            $table->string('order_id');
+            $table->string('order_id', 50);
             $table->foreign('order_id')->references('id')->on('orders')->cascadeOnDelete();
 
             $table->string('label');

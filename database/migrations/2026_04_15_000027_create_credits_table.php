@@ -8,9 +8,9 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('credits', function (Blueprint $table) {
-            $table->string('id')->primary();
+            $table->string('id', 50)->primary();
 
-            $table->string('client_id');
+            $table->string('client_id', 50);
             $table->foreign('client_id')->references('id')->on('clients')->cascadeOnDelete();
 
             $table->foreignId('credit_type_id')->constrained('credit_types');

@@ -10,8 +10,8 @@ return new class extends Migration {
         Schema::create('follows', function (Blueprint $table) {
             $table->id();
 
-            $table->string('follower_id');
-            $table->string('following_id');
+            $table->string('follower_id', 50);
+            $table->string('following_id', 50);
 
             $table->foreign('follower_id')->references('id')->on('users')->cascadeOnDelete();
             $table->foreign('following_id')->references('id')->on('users')->cascadeOnDelete();

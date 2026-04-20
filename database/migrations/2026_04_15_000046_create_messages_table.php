@@ -12,7 +12,7 @@ return new class extends Migration {
 
             $table->foreignId('conversation_id')->constrained('conversations')->cascadeOnDelete();
 
-            $table->string('sender_id');
+            $table->string('sender_id', 50);
             $table->foreign('sender_id')->references('id')->on('users')->cascadeOnDelete();
 
             $table->longText('text')->nullable();

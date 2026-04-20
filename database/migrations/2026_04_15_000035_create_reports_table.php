@@ -8,12 +8,12 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('reports', function (Blueprint $table) {
-            $table->string('id')->primary();
+            $table->string('id', 50)->primary();
 
-            $table->string('client_id');
+            $table->string('client_id', 50);
             $table->foreign('client_id')->references('id')->on('clients')->cascadeOnDelete();
 
-            $table->string('superviseur_id')->nullable();
+            $table->string('superviseur_id', 50)->nullable();
             $table->foreign('superviseur_id')->references('id')->on('users')->nullOnDelete();
 
             $table->foreignId('report_type_id')->constrained('report_types');

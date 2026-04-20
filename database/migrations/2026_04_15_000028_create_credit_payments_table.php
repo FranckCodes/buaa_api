@@ -10,7 +10,7 @@ return new class extends Migration {
         Schema::create('credit_payments', function (Blueprint $table) {
             $table->id();
 
-            $table->string('credit_id');
+            $table->string('credit_id', 50);
             $table->foreign('credit_id')->references('id')->on('credits')->cascadeOnDelete();
 
             $table->integer('periode_annee');

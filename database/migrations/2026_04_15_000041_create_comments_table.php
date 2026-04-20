@@ -11,7 +11,7 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('post_id')->constrained('posts')->cascadeOnDelete();
 
-            $table->string('author_id');
+            $table->string('author_id', 50);
             $table->foreign('author_id')->references('id')->on('users')->cascadeOnDelete();
 
             $table->text('text');

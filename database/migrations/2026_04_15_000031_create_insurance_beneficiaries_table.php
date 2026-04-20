@@ -10,7 +10,7 @@ return new class extends Migration {
         Schema::create('insurance_beneficiaries', function (Blueprint $table) {
             $table->id();
 
-            $table->string('insurance_id');
+            $table->string('insurance_id', 50);
             $table->foreign('insurance_id')->references('id')->on('insurances')->cascadeOnDelete();
 
             $table->string('nom');

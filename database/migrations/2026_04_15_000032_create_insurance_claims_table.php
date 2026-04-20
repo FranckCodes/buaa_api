@@ -8,12 +8,12 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('insurance_claims', function (Blueprint $table) {
-            $table->string('id')->primary();
+            $table->string('id', 50)->primary();
 
-            $table->string('insurance_id');
+            $table->string('insurance_id', 50);
             $table->foreign('insurance_id')->references('id')->on('insurances')->cascadeOnDelete();
 
-            $table->string('client_id');
+            $table->string('client_id', 50);
             $table->foreign('client_id')->references('id')->on('clients')->cascadeOnDelete();
 
             $table->string('type_sinistre');

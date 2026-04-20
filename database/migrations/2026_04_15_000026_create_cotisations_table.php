@@ -10,7 +10,7 @@ return new class extends Migration {
         Schema::create('cotisations', function (Blueprint $table) {
             $table->id();
 
-            $table->string('adhesion_id');
+            $table->string('adhesion_id', 50);
             $table->foreign('adhesion_id')->references('id')->on('adhesions')->cascadeOnDelete();
 
             $table->unsignedInteger('annee');

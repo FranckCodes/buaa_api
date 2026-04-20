@@ -8,12 +8,12 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('business_plans', function (Blueprint $table) {
-            $table->string('id')->primary();
+            $table->string('id', 50)->primary();
 
-            $table->string('credit_id')->unique();
+            $table->string('credit_id', 50)->unique();
             $table->foreign('credit_id')->references('id')->on('credits')->cascadeOnDelete();
 
-            $table->string('client_id');
+            $table->string('client_id', 50);
             $table->foreign('client_id')->references('id')->on('clients')->cascadeOnDelete();
 
             $table->string('titre');

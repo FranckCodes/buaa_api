@@ -8,12 +8,12 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::create('adhesions', function (Blueprint $table) {
-            $table->string('id')->primary();
+            $table->string('id', 50)->primary();
 
-            $table->string('client_id');
+            $table->string('client_id', 50);
             $table->foreign('client_id')->references('id')->on('clients')->cascadeOnDelete();
 
-            $table->string('union_id');
+            $table->string('union_id', 50);
             $table->foreign('union_id')->references('id')->on('unions')->cascadeOnDelete();
 
             $table->foreignId('adhesion_type_id')->constrained('adhesion_types');
