@@ -1,0 +1,204 @@
+# Insurances paths
+/insurances:
+  get:
+    tags: [Insurances]
+    summary: Liste des assurances
+    description: "**Rôles autorisés :** admin, superviseur"
+    security:
+      - sanctumAuth: []
+    responses:
+      '200':
+        description: Liste paginée
+  post:
+    tags: [Insurances]
+    summary: Souscrire une assurance
+    description: "**Rôles autorisés :** client, admin"
+    security:
+      - sanctumAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [client_id, insurance_type_id, montant_annuel]
+            properties:
+              client_id:
+                type: string
+              insurance_type_id:
+                type: integer
+              montant_annuel:
+                type: number
+                format: float
+              description:
+                type: string
+                nullable: true
+              couvertures:
+                type: array
+                items:
+                  type: string
+                nullable: true
+              beneficiaries:
+                type: array
+                nullable: true
+                items:
+                  type: object
+                  properties:
+                    nom:
+                      type: string
+                    age:
+                      type: integer
+                      nullable: true
+                    relation:
+                      type: string
+                      nullable: true
+    responses:
+      '201':
+        $ref: '#/components/responses/Created'
+
+/insurances/{insurance}:
+  get:
+    tags: [Insurances]
+    summary: Détail d'une assurance
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: insurance
+        in: path
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        $ref: '#/components/responses/Success'
+
+/insurances/{insurance}/activate:
+  post:
+    tags: [Insurances]
+    summary: Activer une assurance
+    description: "**Rôles autorisés :** admin, super_admin"
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: insurance
+        in: path
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [processed_by]
+            properties:
+              processed_by:
+                type: string
+    responses:
+      '200':
+        $ref: '#/components/responses/Success'
+      '422':
+        $ref: '#/components/responses/BusinessError'
+
+/insurance-claims:
+  get:
+    tags: [Insurances]
+    summary: Liste des réclamations
+    security:
+      - sanctumAuth: []
+    responses:
+      '200':
+        description: Liste paginée
+  post:
+    tags: [Insurances]
+    summary: Créer une réclamation
+    description: "**Rôles autorisés :** client, admin"
+    security:
+      - sanctumAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [insurance_id, client_id, type_sinistre, montant_reclame]
+            properties:
+              insurance_id:
+                type: string
+              client_id:
+                type: string
+              type_sinistre:
+                type: string
+              montant_reclame:
+                type: number
+                format: float
+              description:
+                type: string
+                nullable: true
+              date_sinistre:
+                type: string
+                format: date
+                nullable: true
+    responses:
+      '201':
+        $ref: '#/components/responses/Created'
+
+/insurance-claims/{claim}/approve:
+  post:
+    tags: [Insurances]
+    summary: Approuver une réclamation
+    description: "**Rôles autorisés :** admin, super_admin"
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: claim
+        in: path
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [amount, processed_by]
+            properties:
+              amount:
+                type: number
+                format: float
+              processed_by:
+                type: string
+    responses:
+      '200':
+        $ref: '#/components/responses/Success'
+      '422':
+        $ref: '#/components/responses/BusinessError'
+
+/insurance-claims/{claim}/reject:
+  post:
+    tags: [Insurances]
+    summary: Rejeter une réclamation
+    description: "**Rôles autorisés :** admin, super_admin"
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: claim
+        in: path
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [processed_by]
+            properties:
+              processed_by:
+                type: string
+    responses:
+      '200':
+        $ref: '#/components/responses/Success'

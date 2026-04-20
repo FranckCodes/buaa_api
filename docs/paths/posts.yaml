@@ -1,0 +1,169 @@
+# Posts paths
+/posts:
+  get:
+    tags: [Posts]
+    summary: Feed des publications (public)
+    responses:
+      '200':
+        description: Feed paginé
+  post:
+    tags: [Posts]
+    summary: Créer une publication
+    description: "**Rôles autorisés :** client, staff"
+    security:
+      - sanctumAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [author_id, content, post_tag_id]
+            properties:
+              author_id:
+                type: string
+              content:
+                type: string
+              post_tag_id:
+                type: integer
+    responses:
+      '201':
+        $ref: '#/components/responses/Created'
+
+/posts/{post}:
+  get:
+    tags: [Posts]
+    summary: Détail d'une publication
+    parameters:
+      - name: post
+        in: path
+        required: true
+        schema:
+          type: integer
+    responses:
+      '200':
+        $ref: '#/components/responses/Success'
+
+/posts/{post}/moderate:
+  post:
+    tags: [Posts]
+    summary: Approuver ou rejeter une publication
+    description: "**Rôles autorisés :** admin, superviseur"
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: post
+        in: path
+        required: true
+        schema:
+          type: integer
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [action, validator_id]
+            properties:
+              action:
+                type: string
+                enum: [approve, reject]
+              validator_id:
+                type: string
+              reason:
+                type: string
+                nullable: true
+    responses:
+      '200':
+        $ref: '#/components/responses/Success'
+
+/posts/{post}/like:
+  post:
+    tags: [Posts]
+    summary: Like / unlike une publication
+    description: "**Rôles autorisés :** client, staff"
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: post
+        in: path
+        required: true
+        schema:
+          type: integer
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [user_id]
+            properties:
+              user_id:
+                type: string
+    responses:
+      '200':
+        description: Toggle like effectué
+        content:
+          application/json:
+            example:
+              success: true
+              message: Action sur le like effectuée.
+              data:
+                liked: true
+                likes_count: 4
+              meta: null
+              errors: null
+
+/posts/{post}/save:
+  post:
+    tags: [Posts]
+    summary: Sauvegarder / retirer une publication
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: post
+        in: path
+        required: true
+        schema:
+          type: integer
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [user_id]
+            properties:
+              user_id:
+                type: string
+    responses:
+      '200':
+        description: Toggle save effectué
+
+/posts/{post}/comments:
+  post:
+    tags: [Posts]
+    summary: Ajouter un commentaire
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: post
+        in: path
+        required: true
+        schema:
+          type: integer
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [user_id, text]
+            properties:
+              user_id:
+                type: string
+              text:
+                type: string
+    responses:
+      '201':
+        $ref: '#/components/responses/Created'

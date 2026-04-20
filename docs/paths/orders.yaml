@@ -1,0 +1,146 @@
+# Orders paths
+/orders:
+  get:
+    tags: [Orders]
+    summary: Liste des commandes
+    description: "**Rôles autorisés :** admin, superviseur"
+    security:
+      - sanctumAuth: []
+    responses:
+      '200':
+        description: Liste paginée des commandes
+  post:
+    tags: [Orders]
+    summary: Créer une commande
+    description: "**Rôles autorisés :** client"
+    security:
+      - sanctumAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [client_id, order_type_id]
+            properties:
+              client_id:
+                type: string
+              order_type_id:
+                type: integer
+              montant:
+                type: number
+                format: float
+                nullable: true
+              description:
+                type: string
+                nullable: true
+              quantite:
+                type: number
+                format: float
+                nullable: true
+              unite:
+                type: string
+                nullable: true
+              priorite:
+                type: string
+                enum: [haute, moyenne, basse]
+    responses:
+      '201':
+        $ref: '#/components/responses/Created'
+      '422':
+        $ref: '#/components/responses/ValidationError'
+
+/orders/{order}:
+  get:
+    tags: [Orders]
+    summary: Détail d'une commande
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: order
+        in: path
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        $ref: '#/components/responses/Success'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+
+/orders/{order}/approve:
+  post:
+    tags: [Orders]
+    summary: Approuver une commande
+    description: |
+      **Rôles autorisés :** admin, superviseur
+      Crée automatiquement les 5 étapes de suivi.
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: order
+        in: path
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [processed_by]
+            properties:
+              processed_by:
+                type: string
+    responses:
+      '200':
+        $ref: '#/components/responses/Success'
+      '422':
+        $ref: '#/components/responses/BusinessError'
+
+/orders/{order}/reject:
+  post:
+    tags: [Orders]
+    summary: Rejeter une commande
+    description: "**Rôles autorisés :** admin, superviseur"
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: order
+        in: path
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [processed_by]
+            properties:
+              processed_by:
+                type: string
+    responses:
+      '200':
+        $ref: '#/components/responses/Success'
+
+/orders/{order}/deliver:
+  post:
+    tags: [Orders]
+    summary: Marquer une commande comme livrée
+    description: "**Rôles autorisés :** admin, super_admin"
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: order
+        in: path
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        $ref: '#/components/responses/Success'
+      '422':
+        $ref: '#/components/responses/BusinessError'

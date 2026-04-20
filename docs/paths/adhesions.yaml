@@ -1,0 +1,175 @@
+# Adhesions paths
+/unions:
+  get:
+    tags: [Adhesions]
+    summary: Liste des unions
+    security:
+      - sanctumAuth: []
+    responses:
+      '200':
+        description: Liste paginée
+  post:
+    tags: [Adhesions]
+    summary: Créer une union
+    description: "**Rôles autorisés :** admin, super_admin"
+    security:
+      - sanctumAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [nom, type]
+            properties:
+              nom:
+                type: string
+              type:
+                type: string
+              province:
+                type: string
+                nullable: true
+              ville:
+                type: string
+                nullable: true
+              president:
+                type: string
+                nullable: true
+    responses:
+      '201':
+        $ref: '#/components/responses/Created'
+
+/adhesion-requests:
+  get:
+    tags: [Adhesions]
+    summary: Liste des demandes d'adhésion
+    security:
+      - sanctumAuth: []
+    responses:
+      '200':
+        description: Liste paginée
+  post:
+    tags: [Adhesions]
+    summary: Créer une demande d'adhésion
+    description: "**Rôles autorisés :** client, admin"
+    security:
+      - sanctumAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [nom, demandeur_type, telephone]
+            properties:
+              nom:
+                type: string
+              demandeur_type:
+                type: string
+                enum: [personne, organisation]
+              telephone:
+                type: string
+              email:
+                type: string
+                nullable: true
+              cotisation:
+                type: number
+                format: float
+                nullable: true
+    responses:
+      '201':
+        $ref: '#/components/responses/Created'
+
+/adhesion-requests/{adhesionRequest}/approve:
+  post:
+    tags: [Adhesions]
+    summary: Approuver une demande d'adhésion
+    description: |
+      **Rôles autorisés :** admin, superviseur
+      Crée automatiquement l'adhésion, le numéro membre et la cotisation initiale.
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: adhesionRequest
+        in: path
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [client_id, union_id, adhesion_type_id, processed_by]
+            properties:
+              client_id:
+                type: string
+              union_id:
+                type: string
+              adhesion_type_id:
+                type: integer
+              payment_mode_id:
+                type: integer
+                nullable: true
+              processed_by:
+                type: string
+    responses:
+      '200':
+        $ref: '#/components/responses/Success'
+      '422':
+        $ref: '#/components/responses/BusinessError'
+
+/adhesion-requests/{adhesionRequest}/reject:
+  post:
+    tags: [Adhesions]
+    summary: Rejeter une demande d'adhésion
+    description: "**Rôles autorisés :** admin, superviseur"
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: adhesionRequest
+        in: path
+        required: true
+        schema:
+          type: string
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [processed_by]
+            properties:
+              processed_by:
+                type: string
+    responses:
+      '200':
+        $ref: '#/components/responses/Success'
+
+/adhesions:
+  get:
+    tags: [Adhesions]
+    summary: Liste des adhésions
+    description: "**Rôles autorisés :** admin, superviseur"
+    security:
+      - sanctumAuth: []
+    responses:
+      '200':
+        description: Liste paginée
+
+/adhesions/{adhesion}:
+  get:
+    tags: [Adhesions]
+    summary: Détail d'une adhésion
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: adhesion
+        in: path
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        $ref: '#/components/responses/Success'

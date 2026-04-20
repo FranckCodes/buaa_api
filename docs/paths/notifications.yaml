@@ -1,0 +1,101 @@
+# Notifications paths
+/notifications/unread-count:
+  get:
+    tags: [Notifications]
+    summary: Compteur de notifications non lues
+    description: "**Rôles autorisés :** tous les utilisateurs authentifiés"
+    security:
+      - sanctumAuth: []
+    responses:
+      '200':
+        description: Compteur récupéré
+        content:
+          application/json:
+            example:
+              success: true
+              message: Compteur récupéré.
+              data:
+                count: 5
+              meta: null
+              errors: null
+
+/notifications/read-all:
+  post:
+    tags: [Notifications]
+    summary: Marquer toutes les notifications comme lues
+    security:
+      - sanctumAuth: []
+    responses:
+      '200':
+        description: Toutes marquées comme lues
+        content:
+          application/json:
+            example:
+              success: true
+              message: Toutes les notifications ont été marquées comme lues.
+              data:
+                updated_count: 5
+              meta: null
+              errors: null
+
+/notifications:
+  get:
+    tags: [Notifications]
+    summary: Liste des notifications du user connecté
+    security:
+      - sanctumAuth: []
+    responses:
+      '200':
+        description: Notifications paginées
+
+/notifications/{notification}:
+  get:
+    tags: [Notifications]
+    summary: Détail d'une notification
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: notification
+        in: path
+        required: true
+        schema:
+          type: integer
+    responses:
+      '200':
+        $ref: '#/components/responses/Success'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+  delete:
+    tags: [Notifications]
+    summary: Supprimer une notification
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: notification
+        in: path
+        required: true
+        schema:
+          type: integer
+    responses:
+      '200':
+        $ref: '#/components/responses/Success'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+
+/notifications/{notification}/read:
+  post:
+    tags: [Notifications]
+    summary: Marquer une notification comme lue
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: notification
+        in: path
+        required: true
+        schema:
+          type: integer
+    responses:
+      '200':
+        $ref: '#/components/responses/Success'
+      '403':
+        $ref: '#/components/responses/Forbidden'

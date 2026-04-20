@@ -1,0 +1,134 @@
+# Messaging paths
+/conversations:
+  get:
+    tags: [Messaging]
+    summary: Boîte de réception (conversations du user connecté)
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: user_id
+        in: query
+        required: true
+        schema:
+          type: string
+    responses:
+      '200':
+        description: Conversations paginées
+  post:
+    tags: [Messaging]
+    summary: Créer une conversation
+    description: Minimum 2 participants uniques requis.
+    security:
+      - sanctumAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [participant_ids]
+            properties:
+              participant_ids:
+                type: array
+                items:
+                  type: string
+                minItems: 2
+                example: [CLT-45678, SUP-001]
+    responses:
+      '201':
+        $ref: '#/components/responses/Created'
+      '422':
+        $ref: '#/components/responses/BusinessError'
+
+/conversations/{conversation}:
+  get:
+    tags: [Messaging]
+    summary: Détail d'une conversation avec messages
+    description: "**Accès :** participants uniquement"
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: conversation
+        in: path
+        required: true
+        schema:
+          type: integer
+    responses:
+      '200':
+        $ref: '#/components/responses/Success'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+
+/conversations/{conversation}/messages:
+  post:
+    tags: [Messaging]
+    summary: Envoyer un message
+    description: "**Accès :** participants uniquement"
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: conversation
+        in: path
+        required: true
+        schema:
+          type: integer
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [sender_id, type]
+            properties:
+              sender_id:
+                type: string
+              text:
+                type: string
+                nullable: true
+              type:
+                type: string
+                enum: [text, image, file]
+                default: text
+              image_url:
+                type: string
+                nullable: true
+              file_url:
+                type: string
+                nullable: true
+              reply_to_message_id:
+                type: integer
+                nullable: true
+    responses:
+      '201':
+        $ref: '#/components/responses/Created'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '422':
+        $ref: '#/components/responses/ValidationError'
+
+/conversations/{conversation}/read:
+  post:
+    tags: [Messaging]
+    summary: Marquer une conversation comme lue
+    description: Remet unread_count à 0 et marque les messages comme lus.
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: conversation
+        in: path
+        required: true
+        schema:
+          type: integer
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [user_id]
+            properties:
+              user_id:
+                type: string
+    responses:
+      '200':
+        $ref: '#/components/responses/Success'

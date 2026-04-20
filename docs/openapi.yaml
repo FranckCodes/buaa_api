@@ -1,0 +1,25 @@
+﻿openapi: 3.0.3
+info:
+  title: BUAA API
+  version: 1.0.0
+  description: API complete de la plateforme BUAA
+servers:
+  - url: http://localhost:8000/api
+    description: Local
+  - url: https://api.buaa.cd/api
+    description: Production
+tags:
+  - name: Auth
+  - name: Clients
+  - name: Credits
+  - name: Orders
+  - name: Reports
+  - name: Support
+  - name: Posts
+  - name: Notifications
+  - name: Messaging
+  - name: Documents
+  - name: Insurances
+  - name: Adhesions
+  - name: Dashboard
+

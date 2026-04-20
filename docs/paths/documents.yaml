@@ -1,0 +1,95 @@
+# Documents paths
+/documents/{type}/{id}:
+  post:
+    tags: [Documents]
+    summary: Attacher un document à une entité
+    description: |
+      **Rôles autorisés :** client, staff
+
+      Types documentables supportés : `client`, `credit`, `adhesion`, `insurance`, `claim`, `order`, `report`
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: type
+        in: path
+        required: true
+        schema:
+          type: string
+          enum: [client, credit, adhesion, insurance, claim, order, report]
+        example: credit
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+        example: CRD-20260419-ABCD
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [type_document, nom_fichier, url]
+            properties:
+              type_document:
+                type: string
+                example: business_plan
+              nom_fichier:
+                type: string
+                example: plan_affaire.pdf
+              url:
+                type: string
+                example: https://example.com/uploads/plan_affaire.pdf
+              taille_bytes:
+                type: integer
+                nullable: true
+                example: 512000
+              mime_type:
+                type: string
+                nullable: true
+                example: application/pdf
+              uploaded_by:
+                type: string
+                nullable: true
+    responses:
+      '201':
+        $ref: '#/components/responses/Created'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+      '404':
+        $ref: '#/components/responses/NotFound'
+
+/documents/{document}:
+  get:
+    tags: [Documents]
+    summary: Détail d'un document
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: document
+        in: path
+        required: true
+        schema:
+          type: integer
+    responses:
+      '200':
+        $ref: '#/components/responses/Success'
+      '403':
+        $ref: '#/components/responses/Forbidden'
+  delete:
+    tags: [Documents]
+    summary: Supprimer un document
+    description: "**Rôles autorisés :** admin, ou uploader du document"
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: document
+        in: path
+        required: true
+        schema:
+          type: integer
+    responses:
+      '200':
+        $ref: '#/components/responses/Success'
+      '403':
+        $ref: '#/components/responses/Forbidden'
