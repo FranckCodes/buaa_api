@@ -14,7 +14,26 @@ use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\ReferenceController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\SupportTicketController;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
+
+// Health check
+Route::get('health', function () {
+    $db = 'ok';
+    try {
+        DB::connection()->getPdo();
+    } catch (\Throwable $e) {
+        $db = 'error: ' . $e->getMessage();
+    }
+
+    return response()->json([
+        'status'    => $db === 'ok' ? 'ok' : 'degraded',
+        'timestamp' => now()->toIso8601String(),
+        'services'  => [
+            'database' => $db,
+        ],
+    ], $db === 'ok' ? 200 : 503);
+});
 
 // Dashboard
 Route::prefix('dashboard')->middleware('auth:sanctum')->group(function () {
