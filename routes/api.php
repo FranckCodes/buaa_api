@@ -54,7 +54,13 @@ Route::prefix('dashboard')->middleware('auth:sanctum')->group(function () {
 // Auth (public)
 Route::prefix('auth')->group(function () {
     Route::post('register', [AuthController::class, 'register']);
-    Route::post('login', [AuthController::class, 'login']);
+
+    // Connexion email/login_code + password (5 tentatives/min)
+    Route::middleware('throttle:5,1')->post('login', [AuthController::class, 'login']);
+
+    // OTP téléphone (5 demandes/min, 10 vérifications/min)
+    Route::middleware('throttle:5,1')->post('otp/request', [AuthController::class, 'requestOtpLogin']);
+    Route::middleware('throttle:10,1')->post('otp/verify', [AuthController::class, 'verifyOtpLogin']);
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('me', [AuthController::class, 'me']);

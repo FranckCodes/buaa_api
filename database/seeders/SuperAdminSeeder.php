@@ -19,7 +19,8 @@ class SuperAdminSeeder extends Seeder
             [
                 'id'             => 'ADM-001',
                 'nom_complet'    => 'Super Administrateur',
-                'telephone'      => '+243000000000',
+                'login_code'     => 'SUPA9K3R2026',
+                'telephone'      => '+243827029543',
                 'password'       => Hash::make('password'),
                 'user_status_id' => $status->id,
             ]

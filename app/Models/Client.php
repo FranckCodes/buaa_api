@@ -8,7 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Client extends Model
 {
@@ -64,9 +63,4 @@ class Client extends Model
     public function supportTickets(): HasMany { return $this->hasMany(SupportTicket::class); }
     public function insuranceClaims(): HasMany { return $this->hasMany(InsuranceClaim::class); }
     public function businessPlans(): HasMany { return $this->hasMany(BusinessPlan::class); }
-
-    public function documents(): MorphMany
-    {
-        return $this->morphMany(Document::class, 'documentable');
-    }
 }
