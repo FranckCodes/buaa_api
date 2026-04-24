@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\ReferenceController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\SupportTicketController;
+use App\Http\Controllers\User\UserController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
@@ -120,6 +121,11 @@ Route::middleware(['auth:sanctum', 'role:super_admin,admin,superviseur'])->group
 
 // Admin seulement
 Route::middleware(['auth:sanctum', 'role:super_admin,admin'])->group(function () {
+    // Gestion des utilisateurs
+    Route::get('users', [UserController::class, 'index']);
+    Route::get('users/{user}', [UserController::class, 'show']);
+    Route::put('users/{user}', [UserController::class, 'update']);
+    Route::delete('users/{user}', [UserController::class, 'destroy']);
     Route::post('users/{user}/client-profile', [ClientController::class, 'storeProfile']);
     Route::put('clients/{client}/profile', [ClientController::class, 'updateProfile']);
     Route::post('credits/{credit}/approve', [CreditController::class, 'approve']);
