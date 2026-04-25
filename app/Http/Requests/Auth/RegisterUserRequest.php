@@ -12,7 +12,9 @@ class RegisterUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'nom_complet'  => ['required', 'string', 'max:255'],
+            'nom'          => ['required', 'string', 'max:100'],
+            'postnom'      => ['nullable', 'string', 'max:100'],
+            'prenom'       => ['required', 'string', 'max:100'],
             'email'        => ['required', 'email', 'max:255', 'unique:users,email'],
             'telephone'    => ['nullable', 'string', 'max:30'],
             'password'     => ['required', 'string', 'min:8', 'confirmed'],

@@ -27,7 +27,9 @@ class UserController extends Controller
             )
             ->when($request->filled('search'), fn ($q) =>
                 $q->where(fn ($s) =>
-                    $s->where('nom_complet', 'like', '%' . $request->search . '%')
+                    $s->where('nom', 'like', '%' . $request->search . '%')
+                      ->orWhere('postnom', 'like', '%' . $request->search . '%')
+                      ->orWhere('prenom', 'like', '%' . $request->search . '%')
                       ->orWhere('email', 'like', '%' . $request->search . '%')
                       ->orWhere('login_code', 'like', '%' . $request->search . '%')
                 )
@@ -58,12 +60,14 @@ class UserController extends Controller
     public function update(Request $request, User $user): JsonResponse
     {
         $data = $request->validate([
-            'nom_complet' => ['sometimes', 'string', 'max:191'],
-            'telephone'   => ['sometimes', 'nullable', 'string', 'max:20'],
-            'photo_profil'=> ['sometimes', 'nullable', 'string'],
-            'role_codes'  => ['sometimes', 'array'],
-            'role_codes.*'=> ['string'],
-            'status_code' => ['sometimes', 'string'],
+            'nom'          => ['sometimes', 'string', 'max:100'],
+            'postnom'      => ['sometimes', 'nullable', 'string', 'max:100'],
+            'prenom'       => ['sometimes', 'string', 'max:100'],
+            'telephone'    => ['sometimes', 'nullable', 'string', 'max:20'],
+            'photo_profil' => ['sometimes', 'nullable', 'string'],
+            'role_codes'   => ['sometimes', 'array'],
+            'role_codes.*' => ['string'],
+            'status_code'  => ['sometimes', 'string'],
         ]);
 
         if (!empty($data['role_codes'])) {
@@ -75,7 +79,9 @@ class UserController extends Controller
         }
 
         $user->update(array_filter([
-            'nom_complet'  => $data['nom_complet'] ?? null,
+            'nom'          => $data['nom'] ?? null,
+            'postnom'      => $data['postnom'] ?? null,
+            'prenom'       => $data['prenom'] ?? null,
             'telephone'    => $data['telephone'] ?? null,
             'photo_profil' => $data['photo_profil'] ?? null,
         ], fn ($v) => !is_null($v)));

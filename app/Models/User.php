@@ -17,9 +17,15 @@ class User extends Authenticatable
     use HasApiTokens, Notifiable;
 
     protected $fillable = [
-        'id', 'nom_complet', 'email', 'login_code', 'telephone', 'password',
+        'id', 'nom', 'postnom', 'prenom', 'email', 'login_code', 'telephone', 'password',
         'user_status_id', 'photo_profil', 'derniere_connexion',
     ];
+
+    // Accesseur : nom complet calculé
+    public function getNomCompletAttribute(): string
+    {
+        return trim(implode(' ', array_filter([$this->nom, $this->postnom, $this->prenom])));
+    }
 
     public $incrementing = false;
     protected $keyType = 'string';
@@ -156,6 +162,16 @@ class User extends Authenticatable
     public function uploadedDocuments(): HasMany
     {
         return $this->hasMany(Document::class, 'uploaded_by');
+    }
+
+    public function superviseurProfile(): HasOne
+    {
+        return $this->hasOne(Superviseur::class, 'id');
+    }
+
+    public function adminProfile(): HasOne
+    {
+        return $this->hasOne(Admin::class, 'id');
     }
 
     public function hasRole(string $code): bool

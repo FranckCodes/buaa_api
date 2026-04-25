@@ -4,9 +4,20 @@ User:
     id:
       type: string
       example: CLT-45678
+    nom:
+      type: string
+      example: Kapuya
+    postnom:
+      type: string
+      nullable: true
+      example: Mwamba
+    prenom:
+      type: string
+      example: Franck
     nom_complet:
       type: string
-      example: Franck Kapuya
+      description: Calculé automatiquement (nom + postnom + prenom)
+      example: Kapuya Mwamba Franck
     email:
       type: string
       format: email

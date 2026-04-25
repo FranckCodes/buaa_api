@@ -12,7 +12,7 @@ class UnionMemberResource extends JsonResource
         return [
             'id'              => $this->id,
             'user'            => new UserResource($this->whenLoaded('user')),
-            'nom_complet'     => $this->nom_complet,
+            'nom_complet'     => $this->resource->nom_complet ?? null,
             'telephone'       => $this->telephone,
             'role_dans_union' => $this->role_dans_union,
             'date_debut'      => $this->date_debut,

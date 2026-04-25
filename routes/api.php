@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\MessagingController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\PostController;
+use App\Http\Controllers\Api\GeoController;
 use App\Http\Controllers\Api\ReferenceController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\SupportTicketController;
@@ -67,6 +68,17 @@ Route::prefix('auth')->group(function () {
         Route::get('me', [AuthController::class, 'me']);
         Route::post('logout', [AuthController::class, 'logout']);
     });
+});
+
+// Géographie (public)
+Route::prefix('geo')->group(function () {
+    Route::get('pays',                                    [GeoController::class, 'pays']);
+    Route::get('provinces',                               [GeoController::class, 'provinces']);
+    Route::get('provinces/{province}/territoires',        [GeoController::class, 'territoires']);
+    Route::get('provinces/{province}/villes',             [GeoController::class, 'villes']);
+    Route::get('provinces/{province}/communes',           [GeoController::class, 'communesParProvince']);
+    Route::get('territoires/{territoire}/secteurs',       [GeoController::class, 'secteurs']);
+    Route::get('villes/{ville}/communes',                 [GeoController::class, 'communes']);
 });
 
 // Références (public)
