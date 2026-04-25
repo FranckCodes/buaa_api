@@ -42,22 +42,39 @@
 /auth/login:
   post:
     tags: [Auth]
-    summary: Connexion utilisateur
+    summary: Connexion par email ou login_code + password
+    description: |
+      Permet la connexion avec :
+      - **Email + password** : `login = email`
+      - **Login code + password** : `login = SUPA9K3R2026`
+      
+      Rate limit : 5 tentatives par minute.
     requestBody:
       required: true
       content:
         application/json:
           schema:
             type: object
-            required: [email, password]
+            required: [login, password]
             properties:
-              email:
+              login:
                 type: string
-                format: email
-                example: admin@buaa.test
+                description: Email ou login_code de l'utilisateur
+                example: superadmin@buaa.cd
               password:
                 type: string
                 example: password
+          examples:
+            email:
+              summary: Connexion par email
+              value:
+                login: superadmin@buaa.cd
+                password: password
+            login_code:
+              summary: Connexion par login_code
+              value:
+                login: SUPA9K3R2026
+                password: password
     responses:
       '200':
         description: Connexion réussie — retourne user + token
@@ -69,13 +86,189 @@
               data:
                 user:
                   id: ADM-001
-                  nom_complet: Super Admin BUAA
-                  email: admin@buaa.test
+                  nom_complet: Super Administrateur
+                  email: superadmin@buaa.cd
+                  login_code: SUPA9K3R2026
+                  telephone: "+243827029543"
+                  roles:
+                    - code: super_admin
+                      label: Super administrateur
+                  status:
+                    code: actif
+                    label: Actif
                 token: 1|abc123...
+              meta: null
+              errors: null
+      '403':
+        description: Compte non actif
+        content:
+          application/json:
+            example:
+              success: false
+              message: Ce compte n'est pas actif.
+              data: null
               meta: null
               errors: null
       '422':
         description: Identifiants invalides
+        content:
+          application/json:
+            example:
+              success: false
+              message: Identifiants invalides.
+              data: null
+              meta: null
+              errors: null
+
+/auth/otp/request:
+  post:
+    tags: [Auth]
+    summary: Demander un code OTP par SMS (étape 1/2)
+    description: |
+      Envoie un code OTP à 6 chiffres par SMS au numéro de téléphone fourni.
+      
+      **Sécurité :**
+      - Code valide 5 minutes
+      - Rate limit : 5 demandes par minute
+      - Supprime les anciens OTP non utilisés du même téléphone
+      
+      En local, le code est visible dans `storage/logs/laravel.log`.
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [telephone]
+            properties:
+              telephone:
+                type: string
+                description: Numéro de téléphone de l'utilisateur
+                example: "+243827029543"
+    responses:
+      '200':
+        description: Code OTP envoyé avec succès
+        content:
+          application/json:
+            example:
+              success: true
+              message: Code OTP envoyé avec succès.
+              data: null
+              meta: null
+              errors: null
+      '422':
+        description: Erreur (utilisateur introuvable ou compte inactif)
+        content:
+          application/json:
+            examples:
+              user_not_found:
+                summary: Utilisateur introuvable
+                value:
+                  success: false
+                  message: Aucun utilisateur trouvé avec ce numéro.
+                  data: null
+                  meta: null
+                  errors: null
+              account_inactive:
+                summary: Compte inactif
+                value:
+                  success: false
+                  message: Ce compte n'est pas actif.
+                  data: null
+                  meta: null
+                  errors: null
+
+/auth/otp/verify:
+  post:
+    tags: [Auth]
+    summary: Vérifier le code OTP et se connecter (étape 2/2)
+    description: |
+      Vérifie le code OTP reçu par SMS et connecte l'utilisateur.
+      
+      **Sécurité :**
+      - Maximum 5 tentatives par OTP
+      - Code expire après 5 minutes
+      - Rate limit : 10 vérifications par minute
+      - Code à usage unique (marqué comme utilisé après vérification)
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [telephone, code]
+            properties:
+              telephone:
+                type: string
+                description: Numéro de téléphone de l'utilisateur
+                example: "+243827029543"
+              code:
+                type: string
+                description: Code OTP à 6 chiffres reçu par SMS
+                example: "482915"
+                minLength: 6
+                maxLength: 6
+    responses:
+      '200':
+        description: Connexion OTP réussie — retourne user + token
+        content:
+          application/json:
+            example:
+              success: true
+              message: Connexion OTP réussie.
+              data:
+                user:
+                  id: ADM-001
+                  nom_complet: Super Administrateur
+                  email: superadmin@buaa.cd
+                  login_code: SUPA9K3R2026
+                  telephone: "+243827029543"
+                  roles:
+                    - code: super_admin
+                      label: Super administrateur
+                  status:
+                    code: actif
+                    label: Actif
+                token: 2|xyz789...
+              meta: null
+              errors: null
+      '422':
+        description: Erreur de vérification
+        content:
+          application/json:
+            examples:
+              no_otp:
+                summary: Aucun OTP valide
+                value:
+                  success: false
+                  message: Aucun OTP valide trouvé.
+                  data: null
+                  meta: null
+                  errors: null
+              expired:
+                summary: Code expiré
+                value:
+                  success: false
+                  message: Le code OTP a expiré.
+                  data: null
+                  meta: null
+                  errors: null
+              max_attempts:
+                summary: Trop de tentatives
+                value:
+                  success: false
+                  message: Nombre maximum de tentatives atteint.
+                  data: null
+                  meta: null
+                  errors: null
+              invalid_code:
+                summary: Code invalide
+                value:
+                  success: false
+                  message: Code OTP invalide.
+                  data: null
+                  meta: null
+                  errors: null
 
 /auth/me:
   get:
@@ -85,7 +278,26 @@
       - sanctumAuth: []
     responses:
       '200':
-        $ref: '#/components/responses/Success'
+        description: Profil récupéré avec succès
+        content:
+          application/json:
+            example:
+              success: true
+              message: Utilisateur authentifié.
+              data:
+                id: ADM-001
+                nom_complet: Super Administrateur
+                email: superadmin@buaa.cd
+                login_code: SUPA9K3R2026
+                telephone: "+243827029543"
+                roles:
+                  - code: super_admin
+                    label: Super administrateur
+                status:
+                  code: actif
+                  label: Actif
+              meta: null
+              errors: null
       '401':
         $ref: '#/components/responses/Unauthorized'
 
@@ -93,10 +305,19 @@
   post:
     tags: [Auth]
     summary: Déconnexion
+    description: Révoque le token d'accès actuel de l'utilisateur.
     security:
       - sanctumAuth: []
     responses:
       '200':
-        $ref: '#/components/responses/Success'
+        description: Déconnexion réussie
+        content:
+          application/json:
+            example:
+              success: true
+              message: Déconnexion réussie.
+              data: null
+              meta: null
+              errors: null
       '401':
         $ref: '#/components/responses/Unauthorized'

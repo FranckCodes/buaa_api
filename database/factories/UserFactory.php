@@ -15,7 +15,9 @@ class UserFactory extends Factory
     {
         return [
             'id'                  => 'USR-' . str_pad((string) fake()->unique()->numberBetween(1, 99999), 5, '0', STR_PAD_LEFT),
-            'nom_complet'         => fake()->name(),
+            'nom'                 => fake()->lastName(),
+            'postnom'             => fake()->optional()->lastName(),
+            'prenom'              => fake()->firstName(),
             'email'               => fake()->unique()->safeEmail(),
             'telephone'           => fake()->phoneNumber(),
             'password'            => Hash::make('password'),

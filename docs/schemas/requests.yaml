@@ -12,11 +12,18 @@ LoginRequest:
 
 RegisterRequest:
   type: object
-  required: [nom_complet, email, password, password_confirmation, role_codes]
+  required: [nom, prenom, email, password, password_confirmation, role_codes]
   properties:
-    nom_complet:
+    nom:
       type: string
-      example: Franck Kapuya
+      example: Kapuya
+    postnom:
+      type: string
+      nullable: true
+      example: Mwamba
+    prenom:
+      type: string
+      example: Franck
     email:
       type: string
       format: email

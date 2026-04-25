@@ -11,9 +11,11 @@ use App\Http\Controllers\Api\MessagingController;
 use App\Http\Controllers\Api\NotificationController;
 use App\Http\Controllers\Api\OrderController;
 use App\Http\Controllers\Api\PostController;
+use App\Http\Controllers\Api\GeoController;
 use App\Http\Controllers\Api\ReferenceController;
 use App\Http\Controllers\Api\ReportController;
 use App\Http\Controllers\Api\SupportTicketController;
+use App\Http\Controllers\User\UserController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
@@ -54,12 +56,29 @@ Route::prefix('dashboard')->middleware('auth:sanctum')->group(function () {
 // Auth (public)
 Route::prefix('auth')->group(function () {
     Route::post('register', [AuthController::class, 'register']);
-    Route::post('login', [AuthController::class, 'login']);
+
+    // Connexion email/login_code + password (5 tentatives/min)
+    Route::middleware('throttle:5,1')->post('login', [AuthController::class, 'login']);
+
+    // OTP téléphone (5 demandes/min, 10 vérifications/min)
+    Route::middleware('throttle:5,1')->post('otp/request', [AuthController::class, 'requestOtpLogin']);
+    Route::middleware('throttle:10,1')->post('otp/verify', [AuthController::class, 'verifyOtpLogin']);
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('me', [AuthController::class, 'me']);
         Route::post('logout', [AuthController::class, 'logout']);
     });
+});
+
+// Géographie (public)
+Route::prefix('geo')->group(function () {
+    Route::get('pays',                                    [GeoController::class, 'pays']);
+    Route::get('provinces',                               [GeoController::class, 'provinces']);
+    Route::get('provinces/{province}/territoires',        [GeoController::class, 'territoires']);
+    Route::get('provinces/{province}/villes',             [GeoController::class, 'villes']);
+    Route::get('provinces/{province}/communes',           [GeoController::class, 'communesParProvince']);
+    Route::get('territoires/{territoire}/secteurs',       [GeoController::class, 'secteurs']);
+    Route::get('villes/{ville}/communes',                 [GeoController::class, 'communes']);
 });
 
 // Références (public)
@@ -114,6 +133,11 @@ Route::middleware(['auth:sanctum', 'role:super_admin,admin,superviseur'])->group
 
 // Admin seulement
 Route::middleware(['auth:sanctum', 'role:super_admin,admin'])->group(function () {
+    // Gestion des utilisateurs
+    Route::get('users', [UserController::class, 'index']);
+    Route::get('users/{user}', [UserController::class, 'show']);
+    Route::put('users/{user}', [UserController::class, 'update']);
+    Route::delete('users/{user}', [UserController::class, 'destroy']);
     Route::post('users/{user}/client-profile', [ClientController::class, 'storeProfile']);
     Route::put('clients/{client}/profile', [ClientController::class, 'updateProfile']);
     Route::post('credits/{credit}/approve', [CreditController::class, 'approve']);

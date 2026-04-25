@@ -18,8 +18,11 @@ class SuperAdminSeeder extends Seeder
             ['email' => 'superadmin@buaa.cd'],
             [
                 'id'             => 'ADM-001',
-                'nom_complet'    => 'Super Administrateur',
-                'telephone'      => '+243000000000',
+                'nom'            => 'Administrateur',
+                'postnom'        => null,
+                'prenom'         => 'Super',
+                'login_code'     => 'SUPA9K3R2026',
+                'telephone'      => '+243827029543',
                 'password'       => Hash::make('password'),
                 'user_status_id' => $status->id,
             ]
