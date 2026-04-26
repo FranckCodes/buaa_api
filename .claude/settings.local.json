@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(extract-text \"C:\\\\Users\\\\PC\\\\Downloads\\\\BUAA_Unions_Adhesions_v3 \\(1\\).docx\")",
+      "Bash(pandoc \"C:\\\\Users\\\\PC\\\\Downloads\\\\BUAA_Unions_Adhesions_v3 \\(1\\).docx\" -o /tmp/buaa_unions.md)",
+      "Read(//tmp/**)",
+      "PowerShell($skill = \"C:\\\\Users\\\\PC\\\\AppData\\\\Roaming\\\\Claude\\\\local-agent-mode-sessions\\\\skills-plugin\\\\45e58467-319e-4975-9276-e0ff73ae326c\\\\c50e840e-0002-4c98-b6b2-6e3a5c8266a7\\\\skills\\\\docx\\\\scripts\"; Get-ChildItem \"$skill\\\\office\\\\\")",
+      "Bash(git add *)"
+    ]
+  }
+}
