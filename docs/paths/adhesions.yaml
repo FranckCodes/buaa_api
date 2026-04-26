@@ -1,4 +1,18 @@
-# Adhesions paths
+# ─────────────────────────────────────────────────────────────────────────────
+# Module : Unions & Adhésions
+# Logique métier (cf. doc BUAA_Unions_Adhesions_v3) :
+#   1. Admin crée une union (statut SUSPENDU par défaut)
+#   2. Le président soumet les documents officiels → EN_REVUE
+#   3. Admin valide → ACTIVE (les adhésions sont alors ouvertes)
+#   4. Super Admin peut désactiver définitivement (irréversible)
+#
+#   Pour rejoindre une union active, le client soumet une demande qui passe
+#   par 3 niveaux de validation : président → superviseur → admin.
+#   Refus à n'importe quel niveau = clôture avec motif.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ============================ UNIONS =========================================
+
 /unions:
   get:
     tags: [Adhesions]
@@ -10,8 +24,11 @@
         description: Liste paginée
   post:
     tags: [Adhesions]
-    summary: Créer une union
-    description: "**Rôles autorisés :** admin, super_admin"
+    summary: Créer une union (statut initial SUSPENDU)
+    description: |
+      **Rôles autorisés :** admin, super_admin
+      L'union est créée en statut **SUSPENDU**. Elle ne peut recevoir
+      aucune adhésion tant qu'elle n'a pas été activée par l'Admin.
     security:
       - sanctumAuth: []
     requestBody:
@@ -20,24 +37,123 @@
         application/json:
           schema:
             type: object
-            required: [nom, type]
+            required: [nom, type, president_id, province_id]
             properties:
-              nom:
+              nom:           { type: string }
+              type:          { type: string }
+              president_id:
                 type: string
-              type:
-                type: string
-              province:
-                type: string
+                description: Utilisateur désigné comme président (relais terrain BUAA)
+              province_id:   { type: integer }
+              territoire_id:
+                type: integer
                 nullable: true
-              ville:
-                type: string
+                description: Obligatoire hors Kinshasa
+              secteur_id:    { type: integer, nullable: true }
+              ville_id:      { type: integer, nullable: true }
+              commune_id:
+                type: integer
                 nullable: true
-              president:
-                type: string
-                nullable: true
+                description: Obligatoire pour Kinshasa (remplace le territoire)
+              adresse:       { type: string,  nullable: true }
+              telephone:     { type: string,  nullable: true }
+              email:         { type: string,  nullable: true }
+              date_creation: { type: string, format: date, nullable: true }
+              secretaire:    { type: string,  nullable: true }
+              tresorier:     { type: string,  nullable: true }
+              commissaire:   { type: string,  nullable: true }
+              superficie_totale:    { type: number, format: float, nullable: true }
+              cultures_principales: { type: array, items: { type: string }, nullable: true }
+              services:             { type: array, items: { type: string }, nullable: true }
     responses:
-      '201':
-        $ref: '#/components/responses/Created'
+      '201': { $ref: '#/components/responses/Created' }
+      '422': { $ref: '#/components/responses/ValidationError' }
+
+/unions/{union}:
+  get:
+    tags: [Adhesions]
+    summary: Détail d'une union
+    security:
+      - sanctumAuth: []
+    parameters:
+      - { name: union, in: path, required: true, schema: { type: string } }
+    responses:
+      '200': { $ref: '#/components/responses/Success' }
+      '404': { $ref: '#/components/responses/NotFound' }
+
+/unions/{union}/submit-documents:
+  post:
+    tags: [Adhesions]
+    summary: Soumettre les documents officiels (président)
+    description: |
+      **Rôle autorisé :** président de l'union concernée.
+      Fait passer l'union de **SUSPENDU → EN_REVUE**.
+      Les fichiers eux-mêmes sont attachés via `POST /documents/Union/{id}`.
+    security:
+      - sanctumAuth: []
+    parameters:
+      - { name: union, in: path, required: true, schema: { type: string } }
+    responses:
+      '200': { $ref: '#/components/responses/Success' }
+      '403': { $ref: '#/components/responses/Forbidden' }
+      '422': { $ref: '#/components/responses/BusinessError' }
+
+/unions/{union}/activate:
+  post:
+    tags: [Adhesions]
+    summary: Valider et activer une union (Admin)
+    description: |
+      **Rôles autorisés :** admin, super_admin
+      Fait passer l'union de **EN_REVUE → ACTIVE**.
+    security:
+      - sanctumAuth: []
+    parameters:
+      - { name: union, in: path, required: true, schema: { type: string } }
+    responses:
+      '200': { $ref: '#/components/responses/Success' }
+      '422': { $ref: '#/components/responses/BusinessError' }
+
+/unions/{union}/suspend:
+  post:
+    tags: [Adhesions]
+    summary: Suspendre une union (Admin, réversible)
+    description: "**Rôles autorisés :** admin, super_admin"
+    security:
+      - sanctumAuth: []
+    parameters:
+      - { name: union, in: path, required: true, schema: { type: string } }
+    responses:
+      '200': { $ref: '#/components/responses/Success' }
+
+/unions/{union}/deactivate:
+  post:
+    tags: [Adhesions]
+    summary: Désactivation définitive (Super Admin uniquement)
+    description: |
+      **Rôle autorisé :** super_admin
+      ⚠️ **Action irréversible.** Une union désactivée ne peut plus être réactivée.
+    security:
+      - sanctumAuth: []
+    parameters:
+      - { name: union, in: path, required: true, schema: { type: string } }
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [reason]
+            properties:
+              reason:
+                type: string
+                minLength: 10
+                description: Justification écrite obligatoire
+    responses:
+      '200': { $ref: '#/components/responses/Success' }
+      '403': { $ref: '#/components/responses/Forbidden' }
+      '422': { $ref: '#/components/responses/ValidationError' }
+
+# ====================== ADHESION REQUESTS ====================================
 
 /adhesion-requests:
   get:
@@ -51,7 +167,10 @@
   post:
     tags: [Adhesions]
     summary: Créer une demande d'adhésion
-    description: "**Rôles autorisés :** client, admin"
+    description: |
+      **Rôles autorisés :** client, admin
+      L'union ciblée doit être **ACTIVE**. Trois lignes de validation
+      (président, superviseur, admin) sont créées en `en_attente`.
     security:
       - sanctumAuth: []
     requestBody:
@@ -60,79 +179,162 @@
         application/json:
           schema:
             type: object
-            required: [nom, demandeur_type, telephone]
+            required: [nom, demandeur_type, telephone, union_id, province_id]
             properties:
-              nom:
-                type: string
+              nom:                       { type: string }
               demandeur_type:
                 type: string
                 enum: [personne, organisation]
-              telephone:
-                type: string
-              email:
-                type: string
+              union_id:                  { type: string }
+              client_id:                 { type: string,  nullable: true }
+              telephone:                 { type: string }
+              email:                     { type: string,  nullable: true }
+              adresse:                   { type: string,  nullable: true }
+              client_activity_type_id:   { type: integer, nullable: true }
+              client_structure_type_id:  { type: integer, nullable: true }
+              representant:              { type: string,  nullable: true }
+              province_id:               { type: integer }
+              territoire_id:
+                type: integer
                 nullable: true
-              cotisation:
-                type: number
-                format: float
+                description: Obligatoire hors Kinshasa
+              secteur_id:                { type: integer, nullable: true }
+              ville_id:                  { type: integer, nullable: true }
+              commune_id:
+                type: integer
                 nullable: true
+                description: Obligatoire pour Kinshasa
+              date_demande:              { type: string, format: date, nullable: true }
+              cotisation:                { type: number, format: float, nullable: true }
+              membres_nombre:            { type: integer, nullable: true }
+              superficie_totale:         { type: number, format: float, nullable: true }
+              type_culture:              { type: string, nullable: true }
+              experience_annees:         { type: integer, nullable: true }
+              nombre_animaux:            { type: integer, nullable: true }
+              type_elevage:              { type: string, nullable: true }
     responses:
-      '201':
-        $ref: '#/components/responses/Created'
+      '201': { $ref: '#/components/responses/Created' }
+      '422': { $ref: '#/components/responses/BusinessError' }
+
+/adhesion-requests/{adhesionRequest}:
+  get:
+    tags: [Adhesions]
+    summary: Détail d'une demande d'adhésion (avec validations)
+    security:
+      - sanctumAuth: []
+    parameters:
+      - { name: adhesionRequest, in: path, required: true, schema: { type: string } }
+    responses:
+      '200': { $ref: '#/components/responses/Success' }
+
+/adhesion-requests/{adhesionRequest}/validate:
+  post:
+    tags: [Adhesions]
+    summary: Enregistrer une décision sur un niveau de validation
+    description: |
+      **Workflow strict :** président → superviseur → admin.
+      Aucun saut n'est autorisé. Un rejet à n'importe quel niveau clôture
+      la demande avec son motif.
+
+      **Niveau `president`** : autorisé pour le président de l'union ciblée.
+      **Niveau `superviseur`** : autorisé pour superviseur ou admin.
+      **Niveau `admin`** : autorisé pour admin ou super_admin.
+    security:
+      - sanctumAuth: []
+    parameters:
+      - { name: adhesionRequest, in: path, required: true, schema: { type: string } }
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [level, decision]
+            properties:
+              level:
+                type: string
+                enum: [president, superviseur, admin]
+              decision:
+                type: string
+                enum: [valide, rejete]
+              motif:
+                type: string
+                nullable: true
+                description: Obligatoire si `decision = rejete`
+    responses:
+      '200': { $ref: '#/components/responses/Success' }
+      '403': { $ref: '#/components/responses/Forbidden' }
+      '422': { $ref: '#/components/responses/BusinessError' }
+
+/adhesion-requests/{adhesionRequest}/activate:
+  post:
+    tags: [Adhesions]
+    summary: Activer le membre (après les 3 validations)
+    description: |
+      **Rôles autorisés :** admin, super_admin
+      Crée l'adhésion, génère un numéro de membre **unique par union**,
+      et crée la cotisation initiale. La demande doit avoir
+      `etape_courante = "accepte"`.
+    security:
+      - sanctumAuth: []
+    parameters:
+      - { name: adhesionRequest, in: path, required: true, schema: { type: string } }
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [client_id, adhesion_type_id, processed_by]
+            properties:
+              client_id:        { type: string }
+              adhesion_type_id: { type: integer }
+              payment_mode_id:  { type: integer, nullable: true }
+              processed_by:     { type: string }
+    responses:
+      '200': { $ref: '#/components/responses/Success' }
+      '422': { $ref: '#/components/responses/BusinessError' }
+
+# ── Endpoints LEGACY (rétro-compat, à terme remplacés par /validate + /activate)
 
 /adhesion-requests/{adhesionRequest}/approve:
   post:
     tags: [Adhesions]
-    summary: Approuver une demande d'adhésion
+    summary: "[LEGACY] Approuver une demande (alias de /activate)"
     description: |
-      **Rôles autorisés :** admin, superviseur
-      Crée automatiquement l'adhésion, le numéro membre et la cotisation initiale.
+      ⚠️ **Endpoint legacy.** Préférer `/validate` (workflow 3 niveaux)
+      puis `/activate` (création de l'adhésion).
     security:
       - sanctumAuth: []
     parameters:
-      - name: adhesionRequest
-        in: path
-        required: true
-        schema:
-          type: string
+      - { name: adhesionRequest, in: path, required: true, schema: { type: string } }
     requestBody:
       required: true
       content:
         application/json:
           schema:
             type: object
-            required: [client_id, union_id, adhesion_type_id, processed_by]
+            required: [client_id, adhesion_type_id, processed_by]
             properties:
-              client_id:
-                type: string
-              union_id:
-                type: string
-              adhesion_type_id:
-                type: integer
-              payment_mode_id:
-                type: integer
-                nullable: true
-              processed_by:
-                type: string
+              client_id:        { type: string }
+              adhesion_type_id: { type: integer }
+              payment_mode_id:  { type: integer, nullable: true }
+              processed_by:     { type: string }
     responses:
-      '200':
-        $ref: '#/components/responses/Success'
-      '422':
-        $ref: '#/components/responses/BusinessError'
+      '200': { $ref: '#/components/responses/Success' }
+      '422': { $ref: '#/components/responses/BusinessError' }
 
 /adhesion-requests/{adhesionRequest}/reject:
   post:
     tags: [Adhesions]
-    summary: Rejeter une demande d'adhésion
-    description: "**Rôles autorisés :** admin, superviseur"
+    summary: "[LEGACY] Rejeter une demande (raccourci Admin)"
+    description: |
+      ⚠️ **Endpoint legacy.** Préférer `/validate` avec `decision = rejete`,
+      qui trace le rejet dans le bon niveau.
     security:
       - sanctumAuth: []
     parameters:
-      - name: adhesionRequest
-        in: path
-        required: true
-        schema:
-          type: string
+      - { name: adhesionRequest, in: path, required: true, schema: { type: string } }
     requestBody:
       required: true
       content:
@@ -141,11 +343,12 @@
             type: object
             required: [processed_by]
             properties:
-              processed_by:
-                type: string
+              processed_by: { type: string }
+              motif:        { type: string, nullable: true }
     responses:
-      '200':
-        $ref: '#/components/responses/Success'
+      '200': { $ref: '#/components/responses/Success' }
+
+# ============================ ADHESIONS ======================================
 
 /adhesions:
   get:
@@ -165,11 +368,6 @@
     security:
       - sanctumAuth: []
     parameters:
-      - name: adhesion
-        in: path
-        required: true
-        schema:
-          type: string
+      - { name: adhesion, in: path, required: true, schema: { type: string } }
     responses:
-      '200':
-        $ref: '#/components/responses/Success'
+      '200': { $ref: '#/components/responses/Success' }

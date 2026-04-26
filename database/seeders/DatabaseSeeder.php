@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             InsuranceStatusSeeder::class,
             AdhesionTypeSeeder::class,
             AdhesionStatusSeeder::class,
+            UnionStatusSeeder::class,
             PaymentModeSeeder::class,
             SuperAdminSeeder::class,
         ]);

@@ -63,6 +63,21 @@ class User extends Authenticatable
         return $this->hasMany(AdhesionRequest::class, 'traite_par');
     }
 
+    public function presidedUnions(): HasMany
+    {
+        return $this->hasMany(Union::class, 'president_id');
+    }
+
+    public function validatedUnions(): HasMany
+    {
+        return $this->hasMany(Union::class, 'validated_by');
+    }
+
+    public function adhesionRequestValidations(): HasMany
+    {
+        return $this->hasMany(AdhesionRequestValidation::class, 'validator_id');
+    }
+
     public function treatedCredits(): HasMany
     {
         return $this->hasMany(Credit::class, 'traite_par');

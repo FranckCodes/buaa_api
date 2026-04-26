@@ -108,6 +108,8 @@ Route::middleware(['auth:sanctum', 'role:super_admin,admin,superviseur'])->group
     Route::get('clients', [ClientController::class, 'index']);
     Route::get('clients/{client}', [ClientController::class, 'show']);
     Route::get('adhesion-requests', [AdhesionController::class, 'requestsIndex']);
+    Route::get('adhesion-requests/{adhesionRequest}', [AdhesionController::class, 'showRequest']);
+    Route::post('adhesion-requests/{adhesionRequest}/validate', [AdhesionController::class, 'validateRequest']);
     Route::get('adhesions', [AdhesionController::class, 'index']);
     Route::get('adhesions/{adhesion}', [AdhesionController::class, 'show']);
     Route::get('credits', [CreditController::class, 'index']);
@@ -126,6 +128,7 @@ Route::middleware(['auth:sanctum', 'role:super_admin,admin,superviseur'])->group
     Route::post('posts/{post}/moderate', [PostController::class, 'moderate']);
     Route::post('adhesion-requests/{adhesionRequest}/approve', [AdhesionController::class, 'approveRequest']);
     Route::post('adhesion-requests/{adhesionRequest}/reject', [AdhesionController::class, 'rejectRequest']);
+    Route::post('adhesion-requests/{adhesionRequest}/activate', [AdhesionController::class, 'activateMembership']);
     Route::post('orders/{order}/approve', [OrderController::class, 'approve']);
     Route::post('orders/{order}/reject', [OrderController::class, 'reject']);
     Route::post('reports/{report}/moderate', [ReportController::class, 'moderate']);
@@ -140,6 +143,13 @@ Route::middleware(['auth:sanctum', 'role:super_admin,admin'])->group(function ()
     Route::delete('users/{user}', [UserController::class, 'destroy']);
     Route::post('users/{user}/client-profile', [ClientController::class, 'storeProfile']);
     Route::put('clients/{client}/profile', [ClientController::class, 'updateProfile']);
+
+    // Cycle de vie d'une union (création + activation + suspension)
+    Route::post('unions/{union}/activate', [AdhesionController::class, 'activateUnion']);
+    Route::post('unions/{union}/suspend',  [AdhesionController::class, 'suspendUnion']);
+    // Désactivation définitive : Super Admin uniquement (vérifié dans UnionPolicy::deactivate via before())
+    Route::post('unions/{union}/deactivate', [AdhesionController::class, 'deactivateUnion']);
+
     Route::post('credits/{credit}/approve', [CreditController::class, 'approve']);
     Route::post('credits/{credit}/reject', [CreditController::class, 'reject']);
     Route::post('credit-payments/{payment}/register', [CreditController::class, 'registerPayment']);
@@ -190,13 +200,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('documents/{document}', [DocumentController::class, 'show']);
     Route::delete('documents/{document}', [DocumentController::class, 'destroy']);
 
-    // Adhésions
+    // Adhésions — lecture publique
     Route::get('unions', [AdhesionController::class, 'unionsIndex']);
+    Route::get('unions/{union}', [AdhesionController::class, 'showUnion']);
     Route::post('unions', [AdhesionController::class, 'storeUnion']);
-    Route::get('adhesion-requests', [AdhesionController::class, 'requestsIndex']);
-    Route::post('adhesion-requests', [AdhesionController::class, 'storeRequest']);
-    Route::post('adhesion-requests/{adhesionRequest}/approve', [AdhesionController::class, 'approveRequest']);
-    Route::post('adhesion-requests/{adhesionRequest}/reject', [AdhesionController::class, 'rejectRequest']);
+
+    // Soumission des documents officiels par le président de l'union
+    Route::post('unions/{union}/submit-documents', [AdhesionController::class, 'submitUnionDocuments']);
+
     Route::get('adhesions', [AdhesionController::class, 'index']);
     Route::get('adhesions/{adhesion}', [AdhesionController::class, 'show']);
 
