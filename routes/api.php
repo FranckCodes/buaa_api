@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\AdminController;
 use App\Http\Controllers\Api\AdhesionController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ClientController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\Api\PostController;
 use App\Http\Controllers\Api\GeoController;
 use App\Http\Controllers\Api\ReferenceController;
 use App\Http\Controllers\Api\ReportController;
+use App\Http\Controllers\Api\SuperviseurController;
 use App\Http\Controllers\Api\SupportTicketController;
 use App\Http\Controllers\User\UserController;
 use Illuminate\Support\Facades\DB;
@@ -138,6 +140,16 @@ Route::middleware(['auth:sanctum', 'role:super_admin,admin'])->group(function ()
     Route::get('users/{user}', [UserController::class, 'show']);
     Route::put('users/{user}', [UserController::class, 'update']);
     Route::delete('users/{user}', [UserController::class, 'destroy']);
+
+    // Superviseurs
+    Route::get('superviseurs', [SuperviseurController::class, 'index']);
+    Route::post('superviseurs', [SuperviseurController::class, 'store']);
+    Route::get('superviseurs/{superviseur}', [SuperviseurController::class, 'show']);
+
+    // Admins
+    Route::get('admins', [AdminController::class, 'index']);
+    Route::post('admins', [AdminController::class, 'store']);
+    Route::get('admins/{admin}', [AdminController::class, 'show']);
     Route::post('users/{user}/client-profile', [ClientController::class, 'storeProfile']);
     Route::put('clients/{client}/profile', [ClientController::class, 'updateProfile']);
     Route::post('credits/{credit}/approve', [CreditController::class, 'approve']);
