@@ -1,30 +1,21 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 
+/**
+ * Cette migration est un no-op.
+ * ville_id a été retiré directement de la migration de création (000009).
+ * Conservée pour ne pas casser l'historique des migrations déjà exécutées en local.
+ */
 return new class extends Migration
 {
     public function up(): void
     {
-        if (!Schema::hasColumn('supervisor_zones', 'ville_id')) {
-            return; // Colonne inexistante, rien à faire
-        }
-
-        Schema::table('supervisor_zones', function (Blueprint $table) {
-            $table->dropForeign(['ville_id']);
-        });
-
-        Schema::table('supervisor_zones', function (Blueprint $table) {
-            $table->dropColumn('ville_id');
-        });
+        // Rien à faire — ville_id n'existe pas dans supervisor_zones en production
     }
 
     public function down(): void
     {
-        Schema::table('supervisor_zones', function (Blueprint $table) {
-            $table->foreignId('ville_id')->nullable()->constrained('villes')->nullOnDelete();
-        });
+        // Rien à faire
     }
 };

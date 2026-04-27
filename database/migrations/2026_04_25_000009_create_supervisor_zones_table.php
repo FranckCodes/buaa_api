@@ -22,7 +22,6 @@ return new class extends Migration
             $table->foreignId('secteur_id')->nullable()->constrained('secteurs')->nullOnDelete();
 
             // Branche urbaine
-            $table->foreignId('ville_id')->nullable()->constrained('villes')->nullOnDelete();
             $table->foreignId('commune_id')->nullable()->constrained('communes')->nullOnDelete();
 
             $table->boolean('is_active')->default(true);
@@ -30,7 +29,7 @@ return new class extends Migration
 
             // Un superviseur ne peut pas avoir deux zones identiques
             $table->unique(
-                ['superviseur_id', 'province_id', 'territoire_id', 'secteur_id', 'ville_id', 'commune_id'],
+                ['superviseur_id', 'province_id', 'territoire_id', 'secteur_id', 'commune_id'],
                 'supervisor_zones_unique'
             );
         });
