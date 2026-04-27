@@ -8,11 +8,16 @@ return new class extends Migration
 {
     public function up(): void
     {
+        if (!Schema::hasColumn('supervisor_zones', 'ville_id')) {
+            return; // Colonne inexistante, rien à faire
+        }
+
         Schema::table('supervisor_zones', function (Blueprint $table) {
-            if (Schema::hasColumn('supervisor_zones', 'ville_id')) {
-                $table->dropForeign(['ville_id']);
-                $table->dropColumn('ville_id');
-            }
+            $table->dropForeign(['ville_id']);
+        });
+
+        Schema::table('supervisor_zones', function (Blueprint $table) {
+            $table->dropColumn('ville_id');
         });
     }
 
