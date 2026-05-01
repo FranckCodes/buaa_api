@@ -1,0 +1,178 @@
+# Superviseurs paths
+/superviseurs:
+  get:
+    tags: [Superviseurs]
+    summary: Liste des superviseurs actifs
+    security:
+      - sanctumAuth: []
+    responses:
+      '200':
+        description: Liste des superviseurs
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+
+  post:
+    tags: [Superviseurs]
+    summary: Créer un superviseur
+    description: |
+      Crée le compte utilisateur (rôle `superviseur`) et le profil superviseur en une seule requête.
+      Le `login_code` est généré automatiquement (ex: `SUP-A3K9P22026`).
+    security:
+      - sanctumAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [nom, prenom, email, password, password_confirmation]
+            properties:
+              nom:
+                type: string
+                example: Mukendi
+              postnom:
+                type: string
+                nullable: true
+                example: Kalala
+              prenom:
+                type: string
+                example: Jean
+              email:
+                type: string
+                format: email
+                example: jean.mukendi@buaa.cd
+              telephone:
+                type: string
+                nullable: true
+                example: "+243812345678"
+              password:
+                type: string
+                example: password123
+              password_confirmation:
+                type: string
+                example: password123
+              matricule:
+                type: string
+                nullable: true
+                example: MAT-2026-001
+              telephone_pro:
+                type: string
+                nullable: true
+              notes:
+                type: string
+                nullable: true
+              is_active:
+                type: boolean
+                default: true
+              date_naissance:
+                type: string
+                format: date
+                nullable: true
+              lieu_naissance:
+                type: string
+                nullable: true
+              sexe:
+                type: string
+                enum: [M, F]
+                nullable: true
+              etat_civil:
+                type: string
+                enum: [celibataire, marie, divorce, veuf]
+                nullable: true
+              nationalite:
+                type: string
+                nullable: true
+              adresse_complete:
+                type: string
+                nullable: true
+              province_id:
+                type: integer
+                nullable: true
+                description: Province de résidence personnelle
+              territoire_id:
+                type: integer
+                nullable: true
+              secteur_id:
+                type: integer
+                nullable: true
+              ville_id:
+                type: integer
+                nullable: true
+              commune_id:
+                type: integer
+                nullable: true
+              niveau_etude:
+                type: string
+                nullable: true
+              specialite:
+                type: string
+                nullable: true
+              experience_annees:
+                type: integer
+                nullable: true
+              type_piece_identite:
+                type: string
+                nullable: true
+                example: CIN
+              numero_piece_identite:
+                type: string
+                nullable: true
+              zones:
+                type: array
+                nullable: true
+                description: Zones de supervision (plusieurs possibles)
+                items:
+                  type: object
+                  required: [province_id]
+                  properties:
+                    province_id:
+                      type: integer
+                    territoire_id:
+                      type: integer
+                      nullable: true
+                      description: Province normale uniquement
+                    secteur_id:
+                      type: integer
+                      nullable: true
+                      description: Nécessite territoire_id
+                    commune_id:
+                      type: integer
+                      nullable: true
+                      description: Kinshasa uniquement
+                example:
+                  - province_id: 2
+                    territoire_id: 8
+                    secteur_id: null
+                    commune_id: null
+                  - province_id: 1
+                    territoire_id: null
+                    secteur_id: null
+                    commune_id: 3
+    responses:
+      '201':
+        description: Superviseur créé avec succès
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '422':
+        $ref: '#/components/responses/ValidationError'
+
+/superviseurs/{superviseur}:
+  get:
+    tags: [Superviseurs]
+    summary: Détail d'un superviseur
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: superviseur
+        in: path
+        required: true
+        schema:
+          type: string
+        example: SUP-00001
+    responses:
+      '200':
+        $ref: '#/components/responses/Success'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '404':
+        $ref: '#/components/responses/NotFound'

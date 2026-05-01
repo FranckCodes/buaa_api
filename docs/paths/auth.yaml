@@ -10,11 +10,18 @@
         application/json:
           schema:
             type: object
-            required: [nom_complet, email, password, password_confirmation, role_codes]
+            required: [nom, prenom, email, password, password_confirmation, role_codes]
             properties:
-              nom_complet:
+              nom:
                 type: string
-                example: Franck Kapuya
+                example: Kapuya
+              postnom:
+                type: string
+                nullable: true
+                example: Mwamba
+              prenom:
+                type: string
+                example: Franck
               email:
                 type: string
                 format: email
@@ -86,7 +93,10 @@
               data:
                 user:
                   id: ADM-001
-                  nom_complet: Super Administrateur
+                  nom: Administrateur
+                  postnom: null
+                  prenom: Super
+                  nom_complet: Administrateur Super
                   email: superadmin@buaa.cd
                   login_code: SUPA9K3R2026
                   telephone: "+243827029543"

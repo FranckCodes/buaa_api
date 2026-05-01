@@ -2,24 +2,204 @@
 info:
   title: BUAA API
   version: 1.0.0
-  description: API complete de la plateforme BUAA
+  description: API complète de la plateforme BUAA
 servers:
-  - url: http://localhost:8000/api
+  - url: http://192.168.1.254:8000/api
     description: Local
   - url: https://api.buaa.cd/api
     description: Production
+
 tags:
   - name: Auth
+    description: Authentification (login, OTP, register, logout)
+  - name: Géographie
+    description: Pays, provinces, territoires, secteurs, villes, communes
+  - name: Références
+    description: Données de référence pour les dropdowns
+  - name: Utilisateurs
+    description: Gestion des utilisateurs
+  - name: Superviseurs
+    description: Création et gestion des superviseurs
+  - name: Admins
+    description: Création et gestion des admins
   - name: Clients
-  - name: Credits
-  - name: Orders
-  - name: Reports
+    description: Profils clients
+  - name: Crédits
+    description: Demandes et gestion des crédits
+  - name: Commandes
+    description: Commandes clients
+  - name: Rapports
+    description: Rapports de suivi
   - name: Support
-  - name: Posts
+    description: Tickets de support
+  - name: Publications
+    description: Posts, commentaires, likes
   - name: Notifications
-  - name: Messaging
+    description: Notifications utilisateur
+  - name: Messagerie
+    description: Conversations et messages
   - name: Documents
-  - name: Insurances
-  - name: Adhesions
+    description: Gestion des documents
+  - name: Assurances
+    description: Souscriptions et réclamations
+  - name: Adhésions
+    description: Adhésions et unions
   - name: Dashboard
+    description: Tableaux de bord
 
+paths:
+  # Auth
+  $ref: './paths/auth.yaml'
+
+  # Géographie
+  /geo/pays:
+    $ref: './paths/geo.yaml#/~1geo~1pays'
+  /geo/provinces:
+    $ref: './paths/geo.yaml#/~1geo~1provinces'
+  /geo/provinces/{province}/territoires:
+    $ref: './paths/geo.yaml#/~1geo~1provinces~1{province}~1territoires'
+  /geo/territoires/{territoire}/secteurs:
+    $ref: './paths/geo.yaml#/~1geo~1territoires~1{territoire}~1secteurs'
+  /geo/provinces/{province}/villes:
+    $ref: './paths/geo.yaml#/~1geo~1provinces~1{province}~1villes'
+  /geo/villes/{ville}/communes:
+    $ref: './paths/geo.yaml#/~1geo~1villes~1{ville}~1communes'
+  /geo/provinces/{province}/communes:
+    $ref: './paths/geo.yaml#/~1geo~1provinces~1{province}~1communes'
+
+  # Références
+  /references/roles:
+    $ref: './paths/references.yaml#/~1references~1roles'
+  /references/user-statuses:
+    $ref: './paths/references.yaml#/~1references~1user-statuses'
+  /references/client-activity-types:
+    $ref: './paths/references.yaml#/~1references~1client-activity-types'
+  /references/client-structure-types:
+    $ref: './paths/references.yaml#/~1references~1client-structure-types'
+  /references/payment-modes:
+    $ref: './paths/references.yaml#/~1references~1payment-modes'
+  /references/adhesion-types:
+    $ref: './paths/references.yaml#/~1references~1adhesion-types'
+  /references/adhesion-statuses:
+    $ref: './paths/references.yaml#/~1references~1adhesion-statuses'
+  /references/credit-types:
+    $ref: './paths/references.yaml#/~1references~1credit-types'
+  /references/credit-statuses:
+    $ref: './paths/references.yaml#/~1references~1credit-statuses'
+  /references/insurance-types:
+    $ref: './paths/references.yaml#/~1references~1insurance-types'
+  /references/insurance-statuses:
+    $ref: './paths/references.yaml#/~1references~1insurance-statuses'
+  /references/order-types:
+    $ref: './paths/references.yaml#/~1references~1order-types'
+  /references/order-statuses:
+    $ref: './paths/references.yaml#/~1references~1order-statuses'
+  /references/report-types:
+    $ref: './paths/references.yaml#/~1references~1report-types'
+  /references/report-statuses:
+    $ref: './paths/references.yaml#/~1references~1report-statuses'
+  /references/post-tags:
+    $ref: './paths/references.yaml#/~1references~1post-tags'
+  /references/post-statuses:
+    $ref: './paths/references.yaml#/~1references~1post-statuses'
+  /references/support-categories:
+    $ref: './paths/references.yaml#/~1references~1support-categories'
+
+  # Utilisateurs
+  /users:
+    $ref: './paths/users.yaml#/~1users'
+  /users/{user}:
+    $ref: './paths/users.yaml#/~1users~1{user}'
+  /users/{user}/client-profile:
+    $ref: './paths/users.yaml#/~1users~1{user}~1client-profile'
+
+  # Superviseurs
+  /superviseurs:
+    $ref: './paths/superviseurs.yaml#/~1superviseurs'
+  /superviseurs/{superviseur}:
+    $ref: './paths/superviseurs.yaml#/~1superviseurs~1{superviseur}'
+
+  # Admins
+  /admins:
+    $ref: './paths/admins.yaml#/~1admins'
+  /admins/{admin}:
+    $ref: './paths/admins.yaml#/~1admins~1{admin}'
+
+components:
+  securitySchemes:
+    sanctumAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  responses:
+    Success:
+      description: Succès
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: true
+              message:
+                type: string
+              data:
+                type: object
+              meta:
+                nullable: true
+              errors:
+                nullable: true
+
+    Created:
+      description: Ressource créée
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: true
+              message:
+                type: string
+              data:
+                type: object
+
+    ValidationError:
+      description: Erreur de validation
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              success:
+                type: boolean
+                example: false
+              message:
+                type: string
+              errors:
+                type: object
+
+    Unauthorized:
+      description: Non authentifié
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Unauthenticated.
+
+    NotFound:
+      description: Ressource introuvable
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Not found.

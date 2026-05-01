@@ -7,9 +7,12 @@ return [
     'allowed_methods' => ['*'],
 
     'allowed_origins' => [
-        'http://' . env('FRONTED_BUAA'),
-        'https://' . env('FRONTED_BUAA'),
+        'http://' . env('FRONTEND_BUAA'),
+        'https://' . env('FRONTEND_BUAA'),
+        'https://' . env('FRONTEND_BUAA_WWW'),
     ],
+
+
 
     'allowed_origins_patterns' => [],
 

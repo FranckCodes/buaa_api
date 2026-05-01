@@ -1,0 +1,227 @@
+# Users paths
+/users:
+  get:
+    tags: [Utilisateurs]
+    summary: Liste des utilisateurs
+    description: Retourne la liste paginée des utilisateurs. Réservé aux admins.
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: role
+        in: query
+        schema:
+          type: string
+        example: superviseur
+        description: Filtrer par rôle (code)
+      - name: status
+        in: query
+        schema:
+          type: string
+        example: actif
+        description: Filtrer par statut
+      - name: search
+        in: query
+        schema:
+          type: string
+        description: Recherche sur nom, prenom, postnom, email, login_code
+      - name: per_page
+        in: query
+        schema:
+          type: integer
+          default: 15
+    responses:
+      '200':
+        description: Liste paginée des utilisateurs
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+
+/users/{user}:
+  get:
+    tags: [Utilisateurs]
+    summary: Détail d'un utilisateur
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: user
+        in: path
+        required: true
+        schema:
+          type: string
+        example: CLT-00042
+    responses:
+      '200':
+        $ref: '#/components/responses/Success'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '404':
+        $ref: '#/components/responses/NotFound'
+
+  put:
+    tags: [Utilisateurs]
+    summary: Mettre à jour un utilisateur
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: user
+        in: path
+        required: true
+        schema:
+          type: string
+        example: CLT-00042
+    requestBody:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              nom:
+                type: string
+              postnom:
+                type: string
+                nullable: true
+              prenom:
+                type: string
+              telephone:
+                type: string
+                nullable: true
+              photo_profil:
+                type: string
+                nullable: true
+              role_codes:
+                type: array
+                items:
+                  type: string
+              status_code:
+                type: string
+    responses:
+      '200':
+        $ref: '#/components/responses/Success'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+
+  delete:
+    tags: [Utilisateurs]
+    summary: Supprimer un utilisateur
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: user
+        in: path
+        required: true
+        schema:
+          type: string
+        example: CLT-00042
+    responses:
+      '200':
+        $ref: '#/components/responses/Success'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+
+/users/{user}/client-profile:
+  post:
+    tags: [Utilisateurs]
+    summary: Créer le profil client d'un utilisateur
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: user
+        in: path
+        required: true
+        schema:
+          type: string
+        example: CLT-00042
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              date_naissance:
+                type: string
+                format: date
+                nullable: true
+              lieu_naissance:
+                type: string
+                nullable: true
+              sexe:
+                type: string
+                enum: [M, F]
+                nullable: true
+              etat_civil:
+                type: string
+                enum: [celibataire, marie, divorce, veuf]
+                nullable: true
+              nationalite:
+                type: string
+                nullable: true
+              adresse_complete:
+                type: string
+                nullable: true
+              province_id:
+                type: integer
+                nullable: true
+              territoire_id:
+                type: integer
+                nullable: true
+              secteur_id:
+                type: integer
+                nullable: true
+              ville_id:
+                type: integer
+                nullable: true
+              commune_id:
+                type: integer
+                nullable: true
+              client_activity_type_id:
+                type: integer
+                nullable: true
+              client_structure_type_id:
+                type: integer
+                nullable: true
+              profession_detaillee:
+                type: string
+                nullable: true
+              experience_annees:
+                type: integer
+                nullable: true
+              superficie_exploitation:
+                type: number
+                nullable: true
+              type_culture:
+                type: string
+                nullable: true
+              nombre_animaux:
+                type: integer
+                nullable: true
+              revenus_mensuels:
+                type: number
+                nullable: true
+              autres_sources_revenus:
+                type: string
+                nullable: true
+              banque_principale:
+                type: string
+                nullable: true
+              numero_compte:
+                type: string
+                nullable: true
+              ref_nom:
+                type: string
+                nullable: true
+              ref_telephone:
+                type: string
+                nullable: true
+              ref_relation:
+                type: string
+                nullable: true
+              superviseur_id:
+                type: string
+                nullable: true
+    responses:
+      '201':
+        $ref: '#/components/responses/Created'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '422':
+        $ref: '#/components/responses/ValidationError'

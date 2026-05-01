@@ -1,0 +1,207 @@
+# Références paths
+/references/roles:
+  get:
+    tags: [Références]
+    summary: Liste des rôles
+    responses:
+      '200':
+        description: Liste des rôles
+        content:
+          application/json:
+            example:
+              success: true
+              data:
+                - id: 1
+                  code: super_admin
+                  label: Super administrateur
+                - id: 2
+                  code: admin
+                  label: Administrateur
+                - id: 3
+                  code: superviseur
+                  label: Superviseur
+                - id: 4
+                  code: client
+                  label: Client
+
+/references/user-statuses:
+  get:
+    tags: [Références]
+    summary: Liste des statuts utilisateur
+    responses:
+      '200':
+        description: Liste des statuts
+        content:
+          application/json:
+            example:
+              success: true
+              data:
+                - id: 1
+                  code: actif
+                  label: Actif
+                - id: 2
+                  code: inactif
+                  label: Inactif
+
+/references/client-activity-types:
+  get:
+    tags: [Références]
+    summary: Types d'activité client
+    description: Utilisé pour le champ `client_activity_type_id`.
+    responses:
+      '200':
+        description: Liste des types d'activité
+        content:
+          application/json:
+            example:
+              success: true
+              data:
+                - id: 1
+                  code: agriculture
+                  label: Agriculture
+                - id: 2
+                  code: elevage
+                  label: Élevage
+
+/references/client-structure-types:
+  get:
+    tags: [Références]
+    summary: Types de structure client
+    description: Utilisé pour le champ `client_structure_type_id`.
+    responses:
+      '200':
+        description: Liste des types de structure
+        content:
+          application/json:
+            example:
+              success: true
+              data:
+                - id: 1
+                  code: individuel
+                  label: Individuel
+                - id: 2
+                  code: cooperative
+                  label: Coopérative
+
+/references/payment-modes:
+  get:
+    tags: [Références]
+    summary: Modes de paiement
+    responses:
+      '200':
+        description: Liste des modes de paiement
+        content:
+          application/json:
+            example:
+              success: true
+              data:
+                - id: 1
+                  code: cash
+                  label: Espèces
+                - id: 2
+                  code: mobile_money
+                  label: Mobile Money
+
+/references/adhesion-types:
+  get:
+    tags: [Références]
+    summary: Types d'adhésion
+    responses:
+      '200':
+        description: Liste des types d'adhésion
+
+/references/adhesion-statuses:
+  get:
+    tags: [Références]
+    summary: Statuts d'adhésion
+    responses:
+      '200':
+        description: Liste des statuts d'adhésion
+
+/references/credit-types:
+  get:
+    tags: [Références]
+    summary: Types de crédit
+    responses:
+      '200':
+        description: Liste des types de crédit
+
+/references/credit-statuses:
+  get:
+    tags: [Références]
+    summary: Statuts de crédit
+    responses:
+      '200':
+        description: Liste des statuts de crédit
+
+/references/insurance-types:
+  get:
+    tags: [Références]
+    summary: Types d'assurance
+    responses:
+      '200':
+        description: Liste des types d'assurance
+
+/references/insurance-statuses:
+  get:
+    tags: [Références]
+    summary: Statuts d'assurance
+    responses:
+      '200':
+        description: Liste des statuts d'assurance
+
+/references/order-types:
+  get:
+    tags: [Références]
+    summary: Types de commande
+    responses:
+      '200':
+        description: Liste des types de commande
+
+/references/order-statuses:
+  get:
+    tags: [Références]
+    summary: Statuts de commande
+    responses:
+      '200':
+        description: Liste des statuts de commande
+
+/references/report-types:
+  get:
+    tags: [Références]
+    summary: Types de rapport
+    responses:
+      '200':
+        description: Liste des types de rapport
+
+/references/report-statuses:
+  get:
+    tags: [Références]
+    summary: Statuts de rapport
+    responses:
+      '200':
+        description: Liste des statuts de rapport
+
+/references/post-tags:
+  get:
+    tags: [Références]
+    summary: Tags de publication
+    responses:
+      '200':
+        description: Liste des tags
+
+/references/post-statuses:
+  get:
+    tags: [Références]
+    summary: Statuts de publication
+    responses:
+      '200':
+        description: Liste des statuts de publication
+
+/references/support-categories:
+  get:
+    tags: [Références]
+    summary: Catégories de support
+    responses:
+      '200':
+        description: Liste des catégories de support

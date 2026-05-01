@@ -1,0 +1,170 @@
+# Géographie paths
+/geo/pays:
+  get:
+    tags: [Géographie]
+    summary: Liste des pays
+    description: Retourne tous les pays. Utilisé pour le champ `nationalite`.
+    responses:
+      '200':
+        description: Liste des pays
+        content:
+          application/json:
+            example:
+              success: true
+              data:
+                - id: 40
+                  code: COD
+                  designation: République démocratique du Congo
+                - id: 41
+                  code: FRA
+                  designation: France
+
+/geo/provinces:
+  get:
+    tags: [Géographie]
+    summary: Liste des provinces
+    description: Retourne toutes les provinces de la RDC. Utilisé pour `province_id`.
+    responses:
+      '200':
+        description: Liste des provinces
+        content:
+          application/json:
+            example:
+              success: true
+              data:
+                - id: 1
+                  designation: Kinshasa
+                  pays_id: 40
+                - id: 2
+                  designation: Kongo Central
+                  pays_id: 40
+
+/geo/provinces/{province}/territoires:
+  get:
+    tags: [Géographie]
+    summary: Territoires d'une province
+    description: |
+      Retourne les territoires d'une province.
+      **Ne pas utiliser pour Kinshasa** — Kinshasa est une ville-province sans territoire.
+    parameters:
+      - name: province
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 2
+    responses:
+      '200':
+        description: Liste des territoires
+        content:
+          application/json:
+            example:
+              success: true
+              data:
+                - id: 5
+                  designation: Luozi
+                  province_id: 2
+                - id: 6
+                  designation: Matadi
+                  province_id: 2
+
+/geo/territoires/{territoire}/secteurs:
+  get:
+    tags: [Géographie]
+    summary: Secteurs d'un territoire
+    description: Retourne les secteurs d'un territoire. Utilisé pour `secteur_id`.
+    parameters:
+      - name: territoire
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 5
+    responses:
+      '200':
+        description: Liste des secteurs
+        content:
+          application/json:
+            example:
+              success: true
+              data:
+                - id: 12
+                  designation: Secteur Luozi
+                  territoire_id: 5
+
+/geo/provinces/{province}/villes:
+  get:
+    tags: [Géographie]
+    summary: Villes d'une province
+    description: Retourne les villes d'une province. Utilisé pour `ville_id`.
+    parameters:
+      - name: province
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 2
+    responses:
+      '200':
+        description: Liste des villes
+        content:
+          application/json:
+            example:
+              success: true
+              data:
+                - id: 3
+                  designation: Matadi
+                  province_id: 2
+
+/geo/villes/{ville}/communes:
+  get:
+    tags: [Géographie]
+    summary: Communes d'une ville
+    description: Retourne les communes d'une ville. Utilisé pour `commune_id`.
+    parameters:
+      - name: ville
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 3
+    responses:
+      '200':
+        description: Liste des communes
+        content:
+          application/json:
+            example:
+              success: true
+              data:
+                - id: 8
+                  designation: Commune de Matadi
+                  ville_id: 3
+
+/geo/provinces/{province}/communes:
+  get:
+    tags: [Géographie]
+    summary: Communes d'une province (Kinshasa)
+    description: |
+      Retourne les communes directement liées aux villes d'une province.
+      **Utiliser uniquement pour Kinshasa** (ville-province sans territoire).
+    parameters:
+      - name: province
+        in: path
+        required: true
+        schema:
+          type: integer
+        example: 1
+    responses:
+      '200':
+        description: Liste des communes
+        content:
+          application/json:
+            example:
+              success: true
+              data:
+                - id: 3
+                  designation: Gombe
+                  ville_id: 1
+                - id: 4
+                  designation: Limete
+                  ville_id: 1

@@ -1,0 +1,152 @@
+# Admins paths
+/admins:
+  get:
+    tags: [Admins]
+    summary: Liste des admins actifs
+    security:
+      - sanctumAuth: []
+    responses:
+      '200':
+        description: Liste des admins
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+
+  post:
+    tags: [Admins]
+    summary: Créer un admin
+    description: |
+      Crée le compte utilisateur (rôle `admin`) et le profil admin en une seule requête.
+      Le `login_code` est généré automatiquement (ex: `ADM-A3K9P22026`).
+    security:
+      - sanctumAuth: []
+    requestBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required: [nom, prenom, email, password, password_confirmation]
+            properties:
+              nom:
+                type: string
+                example: Kabila
+              postnom:
+                type: string
+                nullable: true
+              prenom:
+                type: string
+                example: Marie
+              email:
+                type: string
+                format: email
+                example: marie.kabila@buaa.cd
+              telephone:
+                type: string
+                nullable: true
+              password:
+                type: string
+                example: password123
+              password_confirmation:
+                type: string
+                example: password123
+              matricule:
+                type: string
+                nullable: true
+                example: ADM-2026-001
+              telephone_pro:
+                type: string
+                nullable: true
+              notes:
+                type: string
+                nullable: true
+              is_active:
+                type: boolean
+                default: true
+              date_naissance:
+                type: string
+                format: date
+                nullable: true
+              lieu_naissance:
+                type: string
+                nullable: true
+              sexe:
+                type: string
+                enum: [M, F]
+                nullable: true
+              etat_civil:
+                type: string
+                enum: [celibataire, marie, divorce, veuf]
+                nullable: true
+              nationalite:
+                type: string
+                nullable: true
+              adresse_complete:
+                type: string
+                nullable: true
+              province_id:
+                type: integer
+                nullable: true
+                description: Province de résidence personnelle
+              territoire_id:
+                type: integer
+                nullable: true
+              secteur_id:
+                type: integer
+                nullable: true
+              ville_id:
+                type: integer
+                nullable: true
+              commune_id:
+                type: integer
+                nullable: true
+              niveau_etude:
+                type: string
+                nullable: true
+              specialite:
+                type: string
+                nullable: true
+              experience_annees:
+                type: integer
+                nullable: true
+              type_piece_identite:
+                type: string
+                nullable: true
+                example: Passeport
+              numero_piece_identite:
+                type: string
+                nullable: true
+              provinces:
+                type: array
+                nullable: true
+                description: IDs des provinces à charge de l'admin
+                items:
+                  type: integer
+                example: [1, 2, 5]
+    responses:
+      '201':
+        description: Admin créé avec succès
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '422':
+        $ref: '#/components/responses/ValidationError'
+
+/admins/{admin}:
+  get:
+    tags: [Admins]
+    summary: Détail d'un admin
+    security:
+      - sanctumAuth: []
+    parameters:
+      - name: admin
+        in: path
+        required: true
+        schema:
+          type: string
+        example: ADM-00001
+    responses:
+      '200':
+        $ref: '#/components/responses/Success'
+      '401':
+        $ref: '#/components/responses/Unauthorized'
+      '404':
+        $ref: '#/components/responses/NotFound'
